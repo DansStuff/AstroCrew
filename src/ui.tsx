@@ -30,7 +30,9 @@ import {
   UI_OVERCHARGE_LABEL_MARGIN_TOP,
   UI_OVERCHARGE_LABEL_WIDTH,
   UI_TURRET_CROSSHAIR_PATH,
-  UI_TURRET_CROSSHAIR_SIZE,
+  UI_TURRET_CROSSHAIR_SLICES,
+  UI_TURRET_CROSSHAIR_WIDTH,
+  UI_TURRET_CROSSHAIR_HEIGHT,
   UI_VIRTUAL_HEIGHT,
   UI_VIRTUAL_WIDTH,
   WEAPON_LIGHT_OVERCHARGE_COLOR
@@ -196,28 +198,19 @@ export const uiMenu = () => {
 
     <UiEntity
       uiTransform={{
-        width: '100%',
-        height: '100%',
+        width: UI_TURRET_CROSSHAIR_WIDTH,
+        height: UI_TURRET_CROSSHAIR_HEIGHT,
         positionType: 'absolute',
-        position: { top: 0, left: 0 },
-        justifyContent: 'center',
-        alignItems: 'center',
+        position: { top: UI_HUD_EDGE_PADDING_Y, left: UI_HUD_EDGE_PADDING_X },
         display: isTurretOccupied() ? 'flex' : 'none',
         pointerFilter: 'none'
       }}
-    >
-      <UiEntity
-        uiTransform={{
-          width: UI_TURRET_CROSSHAIR_SIZE * 2,
-          height: UI_TURRET_CROSSHAIR_SIZE * 2,
-          pointerFilter: 'none'
-        }}
-        uiBackground={{
-          texture: { src: UI_TURRET_CROSSHAIR_PATH },
-          textureMode: 'stretch'
-        }}
-      />
-    </UiEntity>
+      uiBackground={{
+        texture: { src: UI_TURRET_CROSSHAIR_PATH },
+        textureMode: 'nine-slices',
+        textureSlices: UI_TURRET_CROSSHAIR_SLICES
+      }}
+    />
 
     <GreenPixelButton
       value="Exit Camera"

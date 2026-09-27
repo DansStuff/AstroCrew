@@ -508,7 +508,7 @@ export function setupSceneObjects(): void {
     engine.removeSystem(attachSceneObjectPointerEvents)
 
     if (overchargeStation) {
-      attachInteractEvent(overchargeStation, 'Overcharge Weapons!')
+      attachInteractEvent(overchargeStation, 'Supercharge Weapons!')
     }
     if (missionTable) {
       attachInteractEvent(missionTable, 'Start Mission')

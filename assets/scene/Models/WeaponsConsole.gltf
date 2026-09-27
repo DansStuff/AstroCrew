@@ -12,7 +12,8 @@
 			"name":"Scene",
 			"nodes":[
 				0,
-				1
+				1,
+				2
 			]
 		}
 	],
@@ -34,6 +35,15 @@
 				1,
 				0
 			]
+		},
+		{
+			"mesh":2,
+			"name":"Cube.001",
+			"translation":[
+				0,
+				1,
+				0.04149097204208374
+			]
 		}
 	],
 	"materials":[
@@ -54,6 +64,25 @@
 		{
 			"doubleSided":true,
 			"emissiveFactor":[
+				0,
+				0.03005208789991798,
+				0
+			],
+			"name":"ScreenBackground",
+			"pbrMetallicRoughness":{
+				"baseColorFactor":[
+					0,
+					0.08848551660776138,
+					0,
+					1
+				],
+				"metallicFactor":0
+			}
+		},
+		{
+			"alphaMode":"BLEND",
+			"doubleSided":true,
+			"emissiveFactor":[
 				1,
 				1,
 				1
@@ -63,15 +92,16 @@
 			},
 			"extensions":{
 				"KHR_materials_emissive_strength":{
-					"emissiveStrength":2
+					"emissiveStrength":1.5
 				}
 			},
-			"name":"ConsoleScreen",
+			"name":"ConsoleScreen.001",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":1
 				},
-				"metallicFactor":0
+				"metallicFactor":0,
+				"roughnessFactor":0.5
 			}
 		}
 	],
@@ -103,6 +133,20 @@
 					"material":1
 				}
 			]
+		},
+		{
+			"name":"Cube.004",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":8,
+						"NORMAL":9,
+						"TEXCOORD_0":10
+					},
+					"indices":7,
+					"material":2
+				}
+			]
 		}
 	],
 	"textures":[
@@ -118,8 +162,8 @@
 	"images":[
 		{
 			"mimeType":"image/png",
-			"name":"crosshair",
-			"uri":"crosshair.png"
+			"name":"cam_crosshair",
+			"uri":"cam_crosshair.png"
 		}
 	],
 	"accessors":[
@@ -190,6 +234,34 @@
 			"componentType":5123,
 			"count":6,
 			"type":"SCALAR"
+		},
+		{
+			"bufferView":8,
+			"componentType":5126,
+			"count":4,
+			"max":[
+				0.5844712257385254,
+				1.3235547542572021,
+				0.8378034234046936
+			],
+			"min":[
+				-0.5835481882095337,
+				0.3206232488155365,
+				0.8378034234046936
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":9,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":10,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC2"
 		}
 	],
 	"bufferViews":[
@@ -240,6 +312,24 @@
 			"byteLength":12,
 			"byteOffset":3204,
 			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":3216,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":3264,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":32,
+			"byteOffset":3312,
+			"target":34962
 		}
 	],
 	"samplers":[
@@ -250,7 +340,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":3216,
+			"byteLength":3344,
 			"uri":"WeaponsConsole.bin"
 		}
 	]

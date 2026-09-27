@@ -483,8 +483,12 @@ export const UI_BACK_TO_SHIP_BUTTON_HEIGHT = '32%'
 export const UI_BACK_TO_SHIP_BUTTON_FONT_SIZE = 36
 
 // Turret camera crosshair
-export const UI_TURRET_CROSSHAIR_PATH = 'assets/scene/Images/cam_crosshair.png'
-export const UI_TURRET_CROSSHAIR_SIZE = 256
+export const UI_TURRET_CROSSHAIR_PATH = 'assets/scene/Images/cam_crosshair_corners.png'
+export const UI_TURRET_CROSSHAIR_SLICES = { top: 0.49, bottom: 0.49, left: 0.49, right: 0.49 }
+/** Screen width left of the right-side column (UI_BACK_TO_SHIP_BUTTON_WIDTH + UI_HUD_EDGE_PADDING_X), inset by UI_HUD_EDGE_PADDING_X on both sides. */
+export const UI_TURRET_CROSSHAIR_WIDTH = '74%'
+/** Full screen height inset by UI_HUD_EDGE_PADDING_Y top and bottom. */
+export const UI_TURRET_CROSSHAIR_HEIGHT = '86%'
 
 // Hull bar
 export const UI_HEALTH_BAR_WIDTH = '30%'

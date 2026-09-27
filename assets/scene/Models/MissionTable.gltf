@@ -3,13 +3,17 @@
 		"generator":"Khronos glTF Blender I/O v4.5.48",
 		"version":"2.0"
 	},
+	"extensionsUsed":[
+		"KHR_materials_emissive_strength"
+	],
 	"scene":0,
 	"scenes":[
 		{
 			"name":"Scene",
 			"nodes":[
 				0,
-				1
+				1,
+				2
 			]
 		}
 	],
@@ -30,6 +34,10 @@
 				0.6109502911567688,
 				0
 			]
+		},
+		{
+			"mesh":1,
+			"name":"Plane.004"
 		}
 	],
 	"materials":[
@@ -54,7 +62,7 @@
 				0.03005208789991798,
 				0
 			],
-			"name":"PlaceholderScreen",
+			"name":"ScreenBackground",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
 					0,
@@ -77,6 +85,31 @@
 				],
 				"metallicFactor":0.7501852512359619,
 				"roughnessFactor":0.609154462814331
+			}
+		},
+		{
+			"alphaMode":"BLEND",
+			"doubleSided":true,
+			"emissiveFactor":[
+				1,
+				1,
+				1
+			],
+			"emissiveTexture":{
+				"index":0
+			},
+			"extensions":{
+				"KHR_materials_emissive_strength":{
+					"emissiveStrength":1.5
+				}
+			},
+			"name":"TableMap",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":1
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
 			}
 		}
 	],
@@ -112,6 +145,37 @@
 					"material":2
 				}
 			]
+		},
+		{
+			"name":"Plane.003",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":12,
+						"NORMAL":13,
+						"TEXCOORD_0":14
+					},
+					"indices":15,
+					"material":3
+				}
+			]
+		}
+	],
+	"textures":[
+		{
+			"sampler":0,
+			"source":0
+		},
+		{
+			"sampler":1,
+			"source":0
+		}
+	],
+	"images":[
+		{
+			"mimeType":"image/png",
+			"name":"map",
+			"uri":"map.png"
 		}
 	],
 	"accessors":[
@@ -216,6 +280,40 @@
 			"componentType":5123,
 			"count":576,
 			"type":"SCALAR"
+		},
+		{
+			"bufferView":12,
+			"componentType":5126,
+			"count":4,
+			"max":[
+				0.7118701338768005,
+				0.6206321120262146,
+				0.7118701338768005
+			],
+			"min":[
+				-0.7118701338768005,
+				0.6206321120262146,
+				-0.7118701338768005
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":13,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":14,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":15,
+			"componentType":5123,
+			"count":6,
+			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
@@ -290,11 +388,45 @@
 			"byteLength":1152,
 			"byteOffset":34088,
 			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":35240,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":35288,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":32,
+			"byteOffset":35336,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":12,
+			"byteOffset":35368,
+			"target":34963
+		}
+	],
+	"samplers":[
+		{
+			"magFilter":9729,
+			"minFilter":9987
+		},
+		{
+			"magFilter":9728,
+			"minFilter":9984
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":35240,
+			"byteLength":35380,
 			"uri":"MissionTable.bin"
 		}
 	]

@@ -457,27 +457,6 @@
             "parent": 512
           }
         },
-        "533": {
-          "json": {
-            "position": {
-              "x": 0,
-              "y": -1.5499992370605469,
-              "z": 0
-            },
-            "scale": {
-              "x": 2.0999999046325684,
-              "y": 2.0999999046325684,
-              "z": 2.0999999046325684
-            },
-            "rotation": {
-              "x": 0,
-              "y": 0,
-              "z": 0,
-              "w": 1
-            },
-            "parent": 512
-          }
-        },
         "534": {
           "json": {
             "position": {
@@ -506,16 +485,16 @@
               "y": 0,
               "z": 0
             },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
             "rotation": {
               "x": 0,
               "y": 0,
               "z": 0,
               "w": 1
-            },
-            "scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
             },
             "parent": 512
           }
@@ -527,16 +506,16 @@
               "y": 0,
               "z": 0
             },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
             "rotation": {
               "x": 0,
               "y": 0,
               "z": 0,
               "w": 1
-            },
-            "scale": {
-              "x": 1,
-              "y": 1,
-              "z": 1
             },
             "parent": 512
           }
@@ -808,13 +787,6 @@
             "invisibleMeshesCollisionMask": 3
           }
         },
-        "533": {
-          "json": {
-            "src": "assets/scene/Models/MapPlane.gltf",
-            "visibleMeshesCollisionMask": 0,
-            "invisibleMeshesCollisionMask": 3
-          }
-        },
         "534": {
           "json": {
             "src": "assets/scene/Models/TutArrow.gltf",
@@ -958,11 +930,6 @@
         "532": {
           "json": {
             "value": "MissionTableText"
-          }
-        },
-        "533": {
-          "json": {
-            "value": "MapPlane"
           }
         },
         "534": {
@@ -1133,7 +1100,6 @@
                   529,
                   530,
                   532,
-                  533,
                   535,
                   536
                 ]
@@ -1212,10 +1178,6 @@
               },
               {
                 "entity": 532,
-                "children": []
-              },
-              {
-                "entity": 533,
                 "children": []
               },
               {
@@ -1314,11 +1276,6 @@
         },
         "532": {
           "json": {}
-        },
-        "533": {
-          "json": {
-            "porportionalScaling": true
-          }
         },
         "534": {
           "json": {
