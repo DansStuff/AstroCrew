@@ -457,27 +457,6 @@
             "parent": 512
           }
         },
-        "534": {
-          "json": {
-            "position": {
-              "x": 1.4316864013671875,
-              "y": 0,
-              "z": 0.2211761474609375
-            },
-            "scale": {
-              "x": 0.20000000298023224,
-              "y": 0.20000000298023224,
-              "z": 0.20000000298023224
-            },
-            "rotation": {
-              "x": 0,
-              "y": 0,
-              "z": 0,
-              "w": 1
-            },
-            "parent": 512
-          }
-        },
         "535": {
           "json": {
             "position": {
@@ -541,6 +520,48 @@
             "parent": 512
           }
         },
+        "66069": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "parent": 512
+          }
+        },
+        "66070": {
+          "json": {
+            "position": {
+              "x": 65.25,
+              "y": 61.86017990112305,
+              "z": 64
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "parent": 0
+          }
+        },
         "131598": {
           "json": {
             "position": {
@@ -602,20 +623,6 @@
           }
         },
         "531": {
-          "json": {
-            "states": [
-              {
-                "clip": "Point",
-                "playing": true,
-                "weight": 1,
-                "speed": 1.399999976158142,
-                "loop": true,
-                "shouldReset": false
-              }
-            ]
-          }
-        },
-        "534": {
           "json": {
             "states": [
               {
@@ -787,13 +794,6 @@
             "invisibleMeshesCollisionMask": 3
           }
         },
-        "534": {
-          "json": {
-            "src": "assets/scene/Models/TutArrow.gltf",
-            "visibleMeshesCollisionMask": 0,
-            "invisibleMeshesCollisionMask": 3
-          }
-        },
         "535": {
           "json": {
             "src": "assets/scene/Models/WeaponLights.gltf",
@@ -811,6 +811,20 @@
         "66063": {
           "json": {
             "src": "assets/scene/Models/TutArrow.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
+          }
+        },
+        "66069": {
+          "json": {
+            "src": "assets/scene/Models/Leaderboard.gltf",
+            "visibleMeshesCollisionMask": 0,
+            "invisibleMeshesCollisionMask": 3
+          }
+        },
+        "66070": {
+          "json": {
+            "src": "assets/scene/Models/Miniship.gltf",
             "visibleMeshesCollisionMask": 0,
             "invisibleMeshesCollisionMask": 3
           }
@@ -932,11 +946,6 @@
             "value": "MissionTableText"
           }
         },
-        "534": {
-          "json": {
-            "value": "MissionTableArrow"
-          }
-        },
         "535": {
           "json": {
             "value": "WeaponLights"
@@ -950,6 +959,16 @@
         "66063": {
           "json": {
             "value": "CenterConsoleArrow"
+          }
+        },
+        "66069": {
+          "json": {
+            "value": "Leaderboard.gltf"
+          }
+        },
+        "66070": {
+          "json": {
+            "value": "Miniship.gltf"
           }
         },
         "131598": {
@@ -998,11 +1017,6 @@
           }
         },
         "531": {
-          "json": {
-            "tags": []
-          }
-        },
-        "534": {
           "json": {
             "tags": []
           }
@@ -1061,7 +1075,8 @@
                 "open": true,
                 "children": [
                   514,
-                  512
+                  512,
+                  66070
                 ]
               },
               {
@@ -1095,13 +1110,13 @@
                   131598,
                   66063,
                   531,
-                  534,
                   528,
                   529,
                   530,
                   532,
                   535,
-                  536
+                  536,
+                  66069
                 ]
               },
               {
@@ -1181,15 +1196,19 @@
                 "children": []
               },
               {
-                "entity": 534,
-                "children": []
-              },
-              {
                 "entity": 535,
                 "children": []
               },
               {
                 "entity": 536,
+                "children": []
+              },
+              {
+                "entity": 66069,
+                "children": []
+              },
+              {
+                "entity": 66070,
                 "children": []
               }
             ]
@@ -1277,11 +1296,6 @@
         "532": {
           "json": {}
         },
-        "534": {
-          "json": {
-            "porportionalScaling": true
-          }
-        },
         "535": {
           "json": {}
         },
@@ -1289,6 +1303,12 @@
           "json": {}
         },
         "66063": {
+          "json": {}
+        },
+        "66069": {
+          "json": {}
+        },
+        "66070": {
           "json": {}
         },
         "131598": {

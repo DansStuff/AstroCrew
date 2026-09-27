@@ -3,12 +3,16 @@
 		"generator":"Khronos glTF Blender I/O v4.5.48",
 		"version":"2.0"
 	},
+	"extensionsUsed":[
+		"KHR_materials_emissive_strength"
+	],
 	"scene":0,
 	"scenes":[
 		{
 			"name":"Scene",
 			"nodes":[
-				0
+				0,
+				1
 			]
 		}
 	],
@@ -21,6 +25,20 @@
 				0.5245141386985779,
 				0.1054907962679863
 			]
+		},
+		{
+			"mesh":1,
+			"name":"SuperchargeWeapons",
+			"scale":[
+				0.682971715927124,
+				0.5245141386985779,
+				0.1054907962679863
+			],
+			"translation":[
+				0,
+				0,
+				-0.019852884113788605
+			]
 		}
 	],
 	"materials":[
@@ -28,33 +46,57 @@
 			"doubleSided":true,
 			"emissiveFactor":[
 				0,
-				0.23625611409569203,
-				0.01019287969441729
+				0.03005208789991798,
+				0
 			],
-			"name":"PlaceholderScreen",
+			"name":"ScreenBackground",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
 					0,
-					0.11911102384328842,
-					0.00200830539688468,
+					0.08848551660776138,
+					0,
 					1
 				],
-				"metallicFactor":0,
-				"roughnessFactor":0.5
+				"metallicFactor":0
 			}
 		},
 		{
 			"doubleSided":true,
-			"name":"Ship",
+			"name":"Metal",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
-					0.14159438014030457,
-					0.12022318691015244,
-					0.16504591703414917,
+					0.14126233756542206,
+					0.1195385530591011,
+					0.16513225436210632,
 					1
 				],
-				"metallicFactor":0.539130449295044,
-				"roughnessFactor":0.7347825765609741
+				"metallicFactor":0.7501852512359619,
+				"roughnessFactor":0.609154462814331
+			}
+		},
+		{
+			"alphaMode":"BLEND",
+			"doubleSided":true,
+			"emissiveFactor":[
+				1,
+				1,
+				1
+			],
+			"emissiveTexture":{
+				"index":0
+			},
+			"extensions":{
+				"KHR_materials_emissive_strength":{
+					"emissiveStrength":1.5
+				}
+			},
+			"name":"SuperchargeWeapons",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":1
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.5
 			}
 		}
 	],
@@ -81,6 +123,37 @@
 					"material":1
 				}
 			]
+		},
+		{
+			"name":"Cube.007",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":8,
+						"NORMAL":9,
+						"TEXCOORD_0":10
+					},
+					"indices":3,
+					"material":2
+				}
+			]
+		}
+	],
+	"textures":[
+		{
+			"sampler":0,
+			"source":0
+		},
+		{
+			"sampler":1,
+			"source":0
+		}
+	],
+	"images":[
+		{
+			"mimeType":"image/png",
+			"name":"supercharge_weapons",
+			"uri":"supercharge_weapons.png"
 		}
 	],
 	"accessors":[
@@ -151,6 +224,34 @@
 			"componentType":5123,
 			"count":78,
 			"type":"SCALAR"
+		},
+		{
+			"bufferView":8,
+			"componentType":5126,
+			"count":4,
+			"max":[
+				0.8985313177108765,
+				0.8985313177108765,
+				-0.4928409457206726
+			],
+			"min":[
+				-0.8985313177108765,
+				-0.8985313177108765,
+				-0.4928409457206726
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":9,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":10,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC2"
 		}
 	],
 	"bufferViews":[
@@ -201,11 +302,39 @@
 			"byteLength":156,
 			"byteOffset":1548,
 			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":1704,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":1752,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":32,
+			"byteOffset":1800,
+			"target":34962
+		}
+	],
+	"samplers":[
+		{
+			"magFilter":9729,
+			"minFilter":9987
+		},
+		{
+			"magFilter":9728,
+			"minFilter":9984
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":1704,
+			"byteLength":1832,
 			"uri":"OverchargeStation.bin"
 		}
 	]

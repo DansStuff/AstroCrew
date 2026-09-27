@@ -193,7 +193,7 @@ export const SCENE_SHIP_POSITION = Vector3.create(64, 64, 64)
  * Scene-space radius of the walkable ship interior around SCENE_SHIP_POSITION.
  * Projected planets are scaled so their surface stays outside this volume.
  */
-export const SHIP_INTERIOR_RADIUS = 10
+export const SHIP_INTERIOR_RADIUS = 20
 
 /** World units per second at mid-leg (ease-in-out averages to this). */
 export const SHIP_CRUISE_SPEED = 800
