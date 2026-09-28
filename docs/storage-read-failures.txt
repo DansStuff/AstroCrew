@@ -1,0 +1,15 @@
+Storage.get and Storage.player.get cannot report a failed read in the installed SDK.
+
+In the installed @dcl/sdk (7.27.1 auth-server build), Storage.get and Storage.player.get resolve null both when the key does not exist (a 404) and when the request fails (network error, the 40 in-flight host call cap, a 5xx, or an unparseable response). They never throw, so "nothing stored" and "could not read" look the same.
+
+This is fixed upstream by js-sdk-toolchain PR #1630 (https://github.com/decentraland/js-sdk-toolchain/pull/1630), merged into the auth-server branch on 2026-09-24 and published as @dcl/sdk@auth-server (7.29.1-36041177279.commit-502e633). After it, get throws on a failed read and resolves null only for a confirmed 404 or a stored null. getValues and delete also throw on failure, and set throws a TypeError for values that cannot be stored as JSON. The latest tag (7.29.0) does not include it. We have not upgraded yet because of other possible breaking changes.
+
+Our code is written for the fixed SDK and still works on the installed one:
+
+Player stats (src/players/stats.ts). Stats are held in memory on the server and written once per changed player when an encounter is cleared or a round ends (flushPlayerStats). A null read applies the default stats. A thrown read keeps writes disabled and retries with backoff (5s, 10s, 20s, 40s, then every 60s). XP earned before a load finishes is kept and added on top of the loaded stats.
+
+Weekly board (src/leaderboard/weeklyBoard.ts). The only write is one per finished mission, in recordWeeklyMission. Loading and week rollover never write. A null read is an empty board. A thrown read leaves the board unloaded, and the next mission retries the read first. If that read or the write fails, the mission is dropped and the board is unchanged. Saved missions that fail to parse are skipped one by one and drop out on the next write. Clients receive the resulting board through notifyWeeklyBoard, the same message used on initial load.
+
+Until the upgrade, a failed read is still treated as "nothing stored". For stats, the player's saved record can be overwritten at the next flush if they earned XP. For the board, the next finished mission can replace the stored board with a board holding only that mission. Both go away once the SDK is upgraded, with no further code changes.
+
+A workaround was considered and rejected: calling the storage service directly with signedFetch and checking the HTTP status. It copies SDK internals (the storage URL selection is not exported).

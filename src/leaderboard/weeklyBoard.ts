@@ -10,20 +10,25 @@ export type WeeklyBoard = {
 const STORAGE_KEY = 'weeklyMissions'
 
 let board: WeeklyBoard = emptyBoard()
-let loadPromise: Promise<void> | null = null
+let loadPromise: Promise<boolean> | null = null
 
 function emptyBoard(weekId: string = utcIsoWeekId()): WeeklyBoard {
   return { weekId, missions: [] }
 }
 
+function snapshot(): WeeklyBoard {
+  return { weekId: board.weekId, missions: board.missions.slice() }
+}
+
 function parseContribution(raw: unknown): RoundContributionRow | null {
   if (typeof raw !== 'object' || raw === null) return null
-  const row = raw as { playerId?: unknown; damage?: unknown; repairs?: unknown }
+  const row = raw as { playerId?: unknown; name?: unknown; damage?: unknown; repairs?: unknown }
   if (typeof row.playerId !== 'string' || row.playerId.length === 0) return null
   if (typeof row.damage !== 'number' || !Number.isFinite(row.damage)) return null
   if (typeof row.repairs !== 'number' || !Number.isFinite(row.repairs)) return null
   return {
     playerId: row.playerId,
+    name: typeof row.name === 'string' ? row.name : '',
     damage: Math.max(0, Math.floor(row.damage)),
     repairs: Math.max(0, Math.floor(row.repairs))
   }
@@ -44,8 +49,9 @@ function parseMission(raw: unknown): MissionRecord | null {
   return { won: mission.won, furthestEncounter: mission.furthestEncounter, contributions }
 }
 
-function parseBoard(raw: string | undefined | null): WeeklyBoard | null {
-  if (!raw) return null
+/** Bad missions are skipped individually; they drop out on the next mission write. */
+function parseBoard(raw: unknown): WeeklyBoard | null {
+  if (typeof raw !== 'string' || raw.length === 0) return null
   try {
     const parsed = JSON.parse(raw) as { weekId?: unknown; missions?: unknown }
     if (typeof parsed.weekId !== 'string' || parsed.weekId.length === 0) return null
@@ -53,8 +59,7 @@ function parseBoard(raw: string | undefined | null): WeeklyBoard | null {
     const missions: MissionRecord[] = []
     for (const mission of parsed.missions) {
       const row = parseMission(mission)
-      if (!row) return null
-      missions.push(row)
+      if (row) missions.push(row)
     }
     return { weekId: parsed.weekId, missions }
   } catch {
@@ -62,69 +67,80 @@ function parseBoard(raw: string | undefined | null): WeeklyBoard | null {
   }
 }
 
-function rollToCurrentWeek(): boolean {
+function rollToCurrentWeek(): void {
   const weekId = utcIsoWeekId()
-  if (board.weekId === weekId) return false
+  if (board.weekId === weekId) return
   board = emptyBoard(weekId)
-  return true
+  console.log(`[SERVER] WeeklyBoard reset for ${weekId}`)
 }
 
-async function persist(): Promise<void> {
+/**
+ * Never writes. A null read (404) is an empty board; a thrown read leaves the
+ * board unloaded so the next `ensureLoaded` retries.
+ */
+async function loadBoard(): Promise<boolean> {
   const { Storage } = await import('@dcl/sdk/server')
-  const saved = await Storage.set(STORAGE_KEY, JSON.stringify(board))
-  if (!saved) {
-    console.log(`[SERVER] WeeklyBoard persist failed (${board.weekId})`)
-  }
-}
-
-async function loadBoard(): Promise<void> {
-  const { Storage } = await import('@dcl/sdk/server')
-  let raw: string | undefined | null = null
+  let raw: string | null
   try {
     raw = await Storage.get<string>(STORAGE_KEY)
-  } catch {
-    raw = null
+  } catch (error) {
+    console.log(`[SERVER] WeeklyBoard load failed: ${String(error)}`)
+    loadPromise = null
+    return false
   }
 
   const loaded = parseBoard(raw)
+  if (raw !== null && raw !== undefined && !loaded) {
+    console.log('[SERVER] WeeklyBoard stored value is invalid; starting empty')
+  }
   board = loaded ?? emptyBoard()
-  if (rollToCurrentWeek()) {
-    console.log(`[SERVER] WeeklyBoard reset for ${board.weekId}`)
-    await persist()
-    return
-  }
-  if (!loaded) {
-    await persist()
-  }
+  rollToCurrentWeek()
+  return true
 }
 
-async function ensureLoaded(): Promise<void> {
+function ensureLoaded(): Promise<boolean> {
   if (!loadPromise) loadPromise = loadBoard()
-  await loadPromise
+  return loadPromise
 }
 
 export function setupWeeklyBoard(): void {
   if (!isServer()) return
-  loadPromise = loadBoard()
+  void ensureLoaded()
 }
 
 export async function getWeeklyBoardSnapshot(): Promise<WeeklyBoard> {
-  await ensureLoaded()
-  if (rollToCurrentWeek()) {
-    console.log(`[SERVER] WeeklyBoard reset for ${board.weekId}`)
-    await persist()
-  }
-  return { weekId: board.weekId, missions: board.missions.slice() }
+  if (await ensureLoaded()) rollToCurrentWeek()
+  return snapshot()
 }
 
+/**
+ * The only board write: one per finished mission. If the board cannot be read
+ * or the write fails, the mission is dropped and the board is left unchanged.
+ */
 export async function recordWeeklyMission(mission: MissionRecord): Promise<WeeklyBoard> {
-  await ensureLoaded()
-  if (rollToCurrentWeek()) {
-    console.log(`[SERVER] WeeklyBoard reset for ${board.weekId}`)
+  if (!(await ensureLoaded())) {
+    console.log('[SERVER] WeeklyBoard unavailable; mission dropped')
+    return snapshot()
   }
-  board.missions.push(mission)
-  board.missions.sort(compareWeeklyMissions)
-  board.missions = board.missions.slice(0, WEEKLY_TOP_N)
-  await persist()
-  return { weekId: board.weekId, missions: board.missions.slice() }
+
+  rollToCurrentWeek()
+  const next: WeeklyBoard = {
+    weekId: board.weekId,
+    missions: [...board.missions, mission].sort(compareWeeklyMissions).slice(0, WEEKLY_TOP_N)
+  }
+
+  const { Storage } = await import('@dcl/sdk/server')
+  let saved = false
+  try {
+    saved = await Storage.set(STORAGE_KEY, JSON.stringify(next))
+  } catch {
+    saved = false
+  }
+  if (!saved) {
+    console.log(`[SERVER] WeeklyBoard write failed (${next.weekId}); mission dropped`)
+    return snapshot()
+  }
+
+  board = next
+  return snapshot()
 }

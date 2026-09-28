@@ -1,12 +1,16 @@
+import { getPlayer } from '@dcl/sdk/players'
 import { PATH_START_STOP_ID } from '../constants'
 
 export type RoundContribution = {
+  name: string
   damage: number
   repairs: number
 }
 
+/** `name` is captured while the player is in the scene; empty if it was unavailable. */
 export type RoundContributionRow = {
   playerId: string
+  name: string
   damage: number
   repairs: number
 }
@@ -24,11 +28,15 @@ function contributionKey(playerAddress: string): string {
   return playerAddress.toLowerCase()
 }
 
+function playerName(playerAddress: string): string {
+  return getPlayer({ userId: playerAddress })?.name ?? ''
+}
+
 function getOrCreate(playerAddress: string): RoundContribution {
   const key = contributionKey(playerAddress)
   const existing = contributions.get(key)
   if (existing) return existing
-  const created: RoundContribution = { damage: 0, repairs: 0 }
+  const created: RoundContribution = { name: playerName(playerAddress), damage: 0, repairs: 0 }
   contributions.set(key, created)
   return created
 }
@@ -62,7 +70,8 @@ export function getContributions(): ReadonlyMap<string, RoundContribution> {
 export function snapshotContributions(): RoundContributionRow[] {
   const rows: RoundContributionRow[] = []
   for (const [playerId, row] of contributions) {
-    rows.push({ playerId, damage: row.damage, repairs: row.repairs })
+    if (!row.name) row.name = playerName(playerId)
+    rows.push({ playerId, name: row.name, damage: row.damage, repairs: row.repairs })
   }
   return rows
 }
@@ -78,7 +87,7 @@ export function snapshotMission(won: boolean): MissionRecord {
 export function contributionMapFromRows(rows: RoundContributionRow[]): Map<string, RoundContribution> {
   const map = new Map<string, RoundContribution>()
   for (const row of rows) {
-    map.set(row.playerId, { damage: row.damage, repairs: row.repairs })
+    map.set(row.playerId, { name: row.name, damage: row.damage, repairs: row.repairs })
   }
   return map
 }

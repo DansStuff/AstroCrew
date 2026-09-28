@@ -17,7 +17,7 @@ import {
   snapshotMission,
   stringifyContributions
 } from '../players/contributions'
-import { awardSkillXp, getEngineeringLevel, onPlayerConnected } from '../players/stats'
+import { awardSkillXp, flushPlayerStats, getEngineeringLevel, onPlayerConnected } from '../players/stats'
 import {
   activateOvercharge,
   applyEncounterActive,
@@ -108,6 +108,7 @@ function publishWeeklyBoard(to?: string): void {
 }
 
 function finishRound(won: boolean): void {
+  void flushPlayerStats()
   const mission = snapshotMission(won)
   console.log(`[SERVER] Round contributions (${won ? 'win' : 'loss'}): ${stringifyContributions()}`)
   notifyRoundResults({
@@ -156,6 +157,7 @@ function applyTransition(from: MissionState, to: MissionState, event: MissionEve
   if (event.type === 'ENCOUNTER_CLEARED') {
     const encounterId = activeEncounter?.id
     disposeEncounter()
+    void flushPlayerStats()
     if (encounterId) {
       applyEncounterEnded(encounterId)
       console.log(`[SERVER] Encounter ${encounterId} ended`)

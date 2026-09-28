@@ -30,8 +30,23 @@ export const DEFAULT_PLAYER_STATS: Omit<PlayerStatsSnapshot, 'playerId'> = {
 
 const STATS_STORAGE_KEY = 'stats'
 const RESERVED_ENTITY_SLOT = 512
+const LOAD_RETRY_INITIAL_MS = 5000
+const LOAD_RETRY_MAX_MS = 60000
+
+type StatsEntry = {
+  address: string
+  status: 'loading' | 'loaded' | 'failed'
+  dirty: boolean
+  pendingGunnerXp: number
+  pendingEngineeringXp: number
+  retryDelayMs: number
+  retryAt: number
+}
+
+type StoredStatsRead = { kind: 'found'; raw: unknown } | { kind: 'absent' } | { kind: 'failed' }
 
 const playerEntities = new Map<string, Entity>()
+const statsEntries = new Map<string, StatsEntry>()
 
 if (isServer()) {
   PlayerStats.validateBeforeChange((value) => {
@@ -146,8 +161,8 @@ function parseXp(value: unknown): number {
   return clampXp(value)
 }
 
-function parseStoredStats(raw: string | undefined | null): Omit<PlayerStatsSnapshot, 'playerId'> | null {
-  if (!raw) return null
+function parseStoredStats(raw: unknown): Omit<PlayerStatsSnapshot, 'playerId'> | null {
+  if (typeof raw !== 'string' || raw.length === 0) return null
   try {
     const parsed = JSON.parse(raw) as {
       gunnerLevel?: unknown
@@ -192,43 +207,86 @@ function storedStatsPayload(stats: Omit<PlayerStatsSnapshot, 'playerId'>): strin
   })
 }
 
-async function persistPlayerStats(playerAddress: string): Promise<void> {
-  if (!isServer()) return
-  const stats = getPlayerStats(playerAddress)
+/**
+ * Null (a 404) means a new player; a thrown read is a failure and is retried.
+ * The installed SDK also resolves null for failed reads, so those are treated
+ * as a new player until the `auth-server` build with js-sdk-toolchain#1630.
+ */
+async function readStoredStats(playerAddress: string): Promise<StoredStatsRead> {
   const { Storage } = await import('@dcl/sdk/server')
-  const saved = await Storage.player.set(playerAddress, STATS_STORAGE_KEY, storedStatsPayload(stats))
-  if (!saved) {
-    console.log(`[SERVER] PlayerStats persist failed for ${playerAddress}`)
+  try {
+    const raw = await Storage.player.get<string>(playerAddress, STATS_STORAGE_KEY)
+    if (raw === null || raw === undefined) return { kind: 'absent' }
+    return { kind: 'found', raw }
+  } catch {
+    return { kind: 'failed' }
   }
 }
 
-async function loadPlayerStats(playerAddress: string): Promise<void> {
-  if (!isServer()) return
-  const entity = getOrCreatePlayerEntity(playerAddress)
-  const { Storage } = await import('@dcl/sdk/server')
+async function loadPlayerStats(key: string): Promise<void> {
+  const entry = statsEntries.get(key)
+  if (!entry || entry.status === 'loaded') return
+  entry.status = 'loading'
 
-  let raw: string | undefined | null = null
-  try {
-    raw = await Storage.player.get<string>(playerAddress, STATS_STORAGE_KEY)
-  } catch {
-    raw = null
-  }
-
-  const loaded = parseStoredStats(raw)
-  if (loaded) {
-    const mutable = PlayerStats.getMutableOrNull(entity)
-    if (!mutable) return
-    mutable.gunnerLevel = loaded.gunnerLevel
-    mutable.engineeringLevel = loaded.engineeringLevel
-    mutable.gunnerXp = loaded.gunnerXp
-    mutable.engineeringXp = loaded.engineeringXp
+  const result = await readStoredStats(entry.address)
+  if (result.kind === 'failed') {
+    entry.status = 'failed'
+    entry.retryAt = Date.now() + entry.retryDelayMs
+    console.log(`[SERVER] PlayerStats load failed for ${entry.address}; retrying in ${entry.retryDelayMs / 1000}s`)
+    entry.retryDelayMs = Math.min(entry.retryDelayMs * 2, LOAD_RETRY_MAX_MS)
     return
   }
 
-  const defaults = defaultSnapshot(statsKey(playerAddress))
-  const saved = await Storage.player.set(playerAddress, STATS_STORAGE_KEY, storedStatsPayload(defaults))
-  if (!saved) {
-    console.log(`[SERVER] PlayerStats seed failed for ${playerAddress}`)
+  const stored = result.kind === 'found' ? parseStoredStats(result.raw) : null
+  const base = stored ?? DEFAULT_PLAYER_STATS
+  const gunner = applyXp(base.gunnerLevel, base.gunnerXp, entry.pendingGunnerXp, 'gunner')
+  const engineering = applyXp(base.engineeringLevel, base.engineeringXp, entry.pendingEngineeringXp, 'engineering')
+
+  const mutable = PlayerStats.getMutableOrNull(getOrCreatePlayerEntity(entry.address))
+  if (mutable) {
+    mutable.gunnerLevel = gunner.level
+    mutable.gunnerXp = gunner.xp
+    mutable.engineeringLevel = engineering.level
+    mutable.engineeringXp = engineering.xp
+  }
+
+  const hadPending = entry.pendingGunnerXp > 0 || entry.pendingEngineeringXp > 0
+  const storedWasInvalid = result.kind === 'found' && stored === null
+  entry.status = 'loaded'
+  entry.dirty = hadPending || storedWasInvalid
+  entry.pendingGunnerXp = 0
+  entry.pendingEngineeringXp = 0
+}
+
+/** Writes every loaded player whose stats changed since the last flush. */
+export async function flushPlayerStats(): Promise<void> {
+  if (!isServer()) return
+  const { Storage } = await import('@dcl/sdk/server')
+  for (const entry of statsEntries.values()) {
+    if (entry.status !== 'loaded' || !entry.dirty) continue
+    entry.dirty = false
+    let saved = false
+    try {
+      saved = await Storage.player.set(
+        entry.address,
+        STATS_STORAGE_KEY,
+        storedStatsPayload(getPlayerStats(entry.address))
+      )
+    } catch {
+      saved = false
+    }
+    if (!saved) {
+      entry.dirty = true
+      console.log(`[SERVER] PlayerStats persist failed for ${entry.address}`)
+    }
+  }
+}
+
+function StatsLoadRetrySystem(): void {
+  const now = Date.now()
+  for (const [key, entry] of statsEntries) {
+    if (entry.status !== 'failed' || now < entry.retryAt) continue
+    void loadPlayerStats(key)
   }
 }
 
@@ -248,13 +306,32 @@ export function awardSkillXp(playerAddress: string, skill: SkillId, amount: numb
     mutable.engineeringXp = next.xp
   }
 
-  void persistPlayerStats(playerAddress)
+  const entry = statsEntries.get(statsKey(playerAddress))
+  if (!entry) return
+  if (entry.status === 'loaded') {
+    entry.dirty = true
+  } else if (skill === 'gunner') {
+    entry.pendingGunnerXp += amount
+  } else {
+    entry.pendingEngineeringXp += amount
+  }
 }
 
 export function onPlayerConnected(playerAddress: string): void {
   if (!isServer()) return
   getOrCreatePlayerEntity(playerAddress)
-  void loadPlayerStats(playerAddress)
+  const key = statsKey(playerAddress)
+  if (statsEntries.has(key)) return
+  statsEntries.set(key, {
+    address: playerAddress,
+    status: 'loading',
+    dirty: false,
+    pendingGunnerXp: 0,
+    pendingEngineeringXp: 0,
+    retryDelayMs: LOAD_RETRY_INITIAL_MS,
+    retryAt: 0
+  })
+  void loadPlayerStats(key)
 }
 
 function reconcilePlayerEntities(): void {
@@ -273,4 +350,5 @@ function reconcilePlayerEntities(): void {
 export function setupPlayers() {
   if (!isServer()) return
   reconcilePlayerEntities()
+  engine.addSystem(StatsLoadRetrySystem)
 }

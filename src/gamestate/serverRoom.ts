@@ -32,7 +32,7 @@ export type RoundResultsNotify = {
   won: boolean
   endedAt: number
   furthestEncounter: string
-  contributions: { playerId: string; damage: number; repairs: number }[]
+  contributions: { playerId: string; name: string; damage: number; repairs: number }[]
 }
 
 export type WeeklyBoardNotify = {
@@ -41,7 +41,7 @@ export type WeeklyBoardNotify = {
   missions: {
     won: boolean
     furthestEncounter: string
-    contributions: { playerId: string; damage: number; repairs: number }[]
+    contributions: { playerId: string; name: string; damage: number; repairs: number }[]
   }[]
 }
 

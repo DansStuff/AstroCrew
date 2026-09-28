@@ -1,5 +1,4 @@
 import { Color4 } from '@dcl/sdk/math'
-import { getPlayer } from '@dcl/sdk/players'
 import ReactEcs, { Button, Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { UI_FONT, UI_TINT, boldUi } from '../constants'
 import { room } from '../networking/messages'
@@ -7,6 +6,7 @@ import { contributionMapFromRows, type RoundContribution } from '../players/cont
 
 type ResultRow = {
   playerId: string
+  name: string
   damage: number
   repairs: number
 }
@@ -35,10 +35,6 @@ function truncateWallet(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`
 }
 
-function displayName(address: string): string {
-  return getPlayer({ userId: address })?.name || truncateWallet(address)
-}
-
 export function showRoundResults(
   contributions: ReadonlyMap<string, RoundContribution>,
   didWin: boolean
@@ -47,6 +43,7 @@ export function showRoundResults(
   rows = [...contributions.entries()]
     .map(([playerId, stats]) => ({
       playerId,
+      name: stats.name || truncateWallet(playerId),
       damage: stats.damage,
       repairs: stats.repairs
     }))
@@ -89,7 +86,7 @@ function ResultRowView(row: ResultRow, key: string) {
           }}
         />
         <Label
-          value={boldUi(displayName(row.playerId))}
+          value={boldUi(row.name)}
           font={UI_FONT}
           fontSize={18}
           color={UI_TINT}

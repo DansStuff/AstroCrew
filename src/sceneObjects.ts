@@ -40,7 +40,7 @@ import { room } from './networking/messages'
 import { Spinner, SpinSystem } from './spinner'
 
 const CURSOR_MAX_DISTANCE = 4
-const PROXIMITY_RADIUS = 3
+const PROXIMITY_RADIUS = 4
 
 const consoleCameras = new Map<Entity, Entity>()
 const consoleTurrets = new Map<Entity, TurretId>()

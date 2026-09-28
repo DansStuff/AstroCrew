@@ -71,6 +71,7 @@ export const Messages = {
     contributions: Schemas.Array(
       Schemas.Map({
         playerId: Schemas.String,
+        name: Schemas.String,
         damage: Schemas.Int,
         repairs: Schemas.Int
       })
@@ -90,6 +91,7 @@ export const Messages = {
         contributions: Schemas.Array(
           Schemas.Map({
             playerId: Schemas.String,
+            name: Schemas.String,
             damage: Schemas.Int,
             repairs: Schemas.Int
           })
