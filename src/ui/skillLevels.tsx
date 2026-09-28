@@ -9,6 +9,8 @@ import {
   UI_GUNNER_ICON_PATH,
   UI_HUD_EDGE_PADDING_X,
   UI_HUD_EDGE_PADDING_Y,
+  UI_SKILL_DOUBLE_XP_FONT_SIZE,
+  UI_SKILL_DOUBLE_XP_ROW_HEIGHT,
   UI_SKILL_ICON_MARGIN_RIGHT,
   UI_SKILL_ICON_WIDTH,
   UI_SKILL_LABEL_WIDTH,
@@ -25,7 +27,7 @@ import {
   UI_SKILL_XP_BAR_HEIGHT,
   UI_SKILL_XP_BAR_MARGIN_TOP
 } from '../constants'
-import { DEFAULT_PLAYER_STATS, getPlayerStats, skillProgress } from '../players/stats'
+import { DEFAULT_PLAYER_STATS, getPlayerStats, isDoubleXpAvailable, skillProgress } from '../players/stats'
 import { GreenPixelFrame } from './greenPixelFrame'
 
 const XP_BAR_TRACK = Color4.create(0.03, 0.04, 0.03, 1)
@@ -176,6 +178,14 @@ export function SkillLevelsHud() {
             'engineering'
           )}
           {emptySkillRows()}
+          <Label
+            value={boldUi(isDoubleXpAvailable(stats) ? 'Double XP Available!' : 'Double XP available at 0:00 UTC')}
+            font={UI_FONT}
+            fontSize={UI_SKILL_DOUBLE_XP_FONT_SIZE}
+            color={UI_TINT}
+            textAlign="bottom-center"
+            uiTransform={{ width: '100%', height: UI_SKILL_DOUBLE_XP_ROW_HEIGHT }}
+          />
         </UiEntity>
       </GreenPixelFrame>
   )

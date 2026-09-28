@@ -1,14 +1,16 @@
 import { engine, Entity, Schemas } from '@dcl/sdk/ecs'
 import { isServer, syncEntity } from '@dcl/sdk/network'
 import { AUTH_SERVER_PEER_ID } from '@dcl/sdk/network/message-bus-sync'
-import { ENGINEERING_XP_GROWTH, ENGINEERING_XP_LEVEL_1, GUNNER_XP_GROWTH, GUNNER_XP_LEVEL_1, SKILL_MAX_LEVEL } from '../constants'
+import { DOUBLE_XP_MULTIPLIER, ENGINEERING_XP_GROWTH, ENGINEERING_XP_LEVEL_1, GUNNER_XP_GROWTH, GUNNER_XP_LEVEL_1, SKILL_MAX_LEVEL } from '../constants'
 
 export const PlayerStats = engine.defineComponent('game:PlayerStats', {
   playerId: Schemas.String,
   gunnerLevel: Schemas.Int,
   engineeringLevel: Schemas.Int,
   gunnerXp: Schemas.Int,
-  engineeringXp: Schemas.Int
+  engineeringXp: Schemas.Int,
+  lastXpAt: Schemas.Int64,
+  doubleXpMission: Schemas.Boolean
 })
 
 export type PlayerStatsSnapshot = {
@@ -17,7 +19,11 @@ export type PlayerStatsSnapshot = {
   engineeringLevel: number
   gunnerXp: number
   engineeringXp: number
+  lastXpAt: number
+  doubleXpMission: boolean
 }
+
+type StoredStats = Omit<PlayerStatsSnapshot, 'playerId' | 'doubleXpMission'>
 
 export type SkillId = 'gunner' | 'engineering'
 
@@ -25,7 +31,9 @@ export const DEFAULT_PLAYER_STATS: Omit<PlayerStatsSnapshot, 'playerId'> = {
   gunnerLevel: 1,
   engineeringLevel: 1,
   gunnerXp: 0,
-  engineeringXp: 0
+  engineeringXp: 0,
+  lastXpAt: 0,
+  doubleXpMission: false
 }
 
 const STATS_STORAGE_KEY = 'stats'
@@ -64,8 +72,28 @@ function defaultSnapshot(playerId: string): PlayerStatsSnapshot {
     gunnerLevel: DEFAULT_PLAYER_STATS.gunnerLevel,
     engineeringLevel: DEFAULT_PLAYER_STATS.engineeringLevel,
     gunnerXp: DEFAULT_PLAYER_STATS.gunnerXp,
-    engineeringXp: DEFAULT_PLAYER_STATS.engineeringXp
+    engineeringXp: DEFAULT_PLAYER_STATS.engineeringXp,
+    lastXpAt: DEFAULT_PLAYER_STATS.lastXpAt,
+    doubleXpMission: DEFAULT_PLAYER_STATS.doubleXpMission
   }
+}
+
+function utcDayId(ms: number): string {
+  const date = new Date(ms)
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  return `${date.getUTCFullYear()}-${month}-${day}`
+}
+
+function receivedXpToday(lastXpAt: number, nowMs: number): boolean {
+  return lastXpAt > 0 && utcDayId(lastXpAt) === utcDayId(nowMs)
+}
+
+export function isDoubleXpAvailable(
+  stats: Pick<PlayerStatsSnapshot, 'lastXpAt' | 'doubleXpMission'>,
+  nowMs: number = Date.now()
+): boolean {
+  return stats.doubleXpMission || !receivedXpToday(stats.lastXpAt, nowMs)
 }
 
 function xpBase(skill: SkillId): number {
@@ -161,7 +189,12 @@ function parseXp(value: unknown): number {
   return clampXp(value)
 }
 
-function parseStoredStats(raw: unknown): Omit<PlayerStatsSnapshot, 'playerId'> | null {
+function parseTimestamp(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return 0
+  return Math.floor(value)
+}
+
+function parseStoredStats(raw: unknown): StoredStats | null {
   if (typeof raw !== 'string' || raw.length === 0) return null
   try {
     const parsed = JSON.parse(raw) as {
@@ -169,6 +202,7 @@ function parseStoredStats(raw: unknown): Omit<PlayerStatsSnapshot, 'playerId'> |
       engineeringLevel?: unknown
       gunnerXp?: unknown
       engineeringXp?: unknown
+      lastXpAt?: unknown
     }
     const gunnerLevel = parseLevel(parsed.gunnerLevel)
     const engineeringLevel = parseLevel(parsed.engineeringLevel)
@@ -177,7 +211,8 @@ function parseStoredStats(raw: unknown): Omit<PlayerStatsSnapshot, 'playerId'> |
       gunnerLevel,
       engineeringLevel,
       gunnerXp: parseXp(parsed.gunnerXp),
-      engineeringXp: parseXp(parsed.engineeringXp)
+      engineeringXp: parseXp(parsed.engineeringXp),
+      lastXpAt: parseTimestamp(parsed.lastXpAt)
     }
   } catch {
     return null
@@ -198,12 +233,13 @@ export function getEngineeringLevel(playerAddress: string): number {
   return getPlayerStats(playerAddress).engineeringLevel
 }
 
-function storedStatsPayload(stats: Omit<PlayerStatsSnapshot, 'playerId'>): string {
+function storedStatsPayload(stats: StoredStats): string {
   return JSON.stringify({
     gunnerLevel: stats.gunnerLevel,
     engineeringLevel: stats.engineeringLevel,
     gunnerXp: stats.gunnerXp,
-    engineeringXp: stats.engineeringXp
+    engineeringXp: stats.engineeringXp,
+    lastXpAt: stats.lastXpAt
   })
 }
 
@@ -242,15 +278,16 @@ async function loadPlayerStats(key: string): Promise<void> {
   const gunner = applyXp(base.gunnerLevel, base.gunnerXp, entry.pendingGunnerXp, 'gunner')
   const engineering = applyXp(base.engineeringLevel, base.engineeringXp, entry.pendingEngineeringXp, 'engineering')
 
+  const hadPending = entry.pendingGunnerXp > 0 || entry.pendingEngineeringXp > 0
   const mutable = PlayerStats.getMutableOrNull(getOrCreatePlayerEntity(entry.address))
   if (mutable) {
     mutable.gunnerLevel = gunner.level
     mutable.gunnerXp = gunner.xp
     mutable.engineeringLevel = engineering.level
     mutable.engineeringXp = engineering.xp
+    mutable.lastXpAt = hadPending ? Date.now() : base.lastXpAt
   }
 
-  const hadPending = entry.pendingGunnerXp > 0 || entry.pendingEngineeringXp > 0
   const storedWasInvalid = result.kind === 'found' && stored === null
   entry.status = 'loaded'
   entry.dirty = hadPending || storedWasInvalid
@@ -296,24 +333,48 @@ export function awardSkillXp(playerAddress: string, skill: SkillId, amount: numb
   const mutable = PlayerStats.getMutableOrNull(entity)
   if (!mutable) return
 
+  const awarded = mutable.doubleXpMission ? amount * DOUBLE_XP_MULTIPLIER : amount
   if (skill === 'gunner') {
-    const next = applyXp(mutable.gunnerLevel, mutable.gunnerXp, amount, 'gunner')
+    const next = applyXp(mutable.gunnerLevel, mutable.gunnerXp, awarded, 'gunner')
     mutable.gunnerLevel = next.level
     mutable.gunnerXp = next.xp
   } else {
-    const next = applyXp(mutable.engineeringLevel, mutable.engineeringXp, amount, 'engineering')
+    const next = applyXp(mutable.engineeringLevel, mutable.engineeringXp, awarded, 'engineering')
     mutable.engineeringLevel = next.level
     mutable.engineeringXp = next.xp
   }
+  mutable.lastXpAt = Date.now()
 
   const entry = statsEntries.get(statsKey(playerAddress))
   if (!entry) return
   if (entry.status === 'loaded') {
     entry.dirty = true
   } else if (skill === 'gunner') {
-    entry.pendingGunnerXp += amount
+    entry.pendingGunnerXp += awarded
   } else {
-    entry.pendingEngineeringXp += amount
+    entry.pendingEngineeringXp += awarded
+  }
+}
+
+/** Flags loaded players who have not received XP this UTC day; late joiners and loaders are not flagged. */
+export function beginMissionDoubleXp(): void {
+  if (!isServer()) return
+  const now = Date.now()
+  const flagged: string[] = []
+  for (const entry of statsEntries.values()) {
+    const mutable = PlayerStats.getMutableOrNull(getOrCreatePlayerEntity(entry.address))
+    if (!mutable) continue
+    mutable.doubleXpMission = entry.status === 'loaded' && !receivedXpToday(mutable.lastXpAt, now)
+    if (mutable.doubleXpMission) flagged.push(entry.address)
+  }
+  console.log(`[SERVER] Double XP this mission: ${flagged.length > 0 ? flagged.join(', ') : 'none'}`)
+}
+
+export function endMissionDoubleXp(): void {
+  if (!isServer()) return
+  for (const [entity, data] of engine.getEntitiesWith(PlayerStats)) {
+    if (!data.doubleXpMission) continue
+    PlayerStats.getMutable(entity).doubleXpMission = false
   }
 }
 

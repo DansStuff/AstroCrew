@@ -101,6 +101,8 @@ export const ENGINEERING_XP_GROWTH = 1.5
 export const SKILL_XP_PER_GUNNER_HIT = 5
 /** Engineering XP granted for each successful breach repair. */
 export const SKILL_XP_PER_REPAIR = 40
+/** XP multiplier for a player's first mission of each UTC day. */
+export const DOUBLE_XP_MULTIPLIER = 2
 
 /** Seconds after a stage signal before the first spawn. */
 export const ENCOUNTER_STAGE_TELEGRAPH_SECONDS = 2
@@ -523,6 +525,8 @@ export const UI_SKILL_LABEL_WIDTH = '50%'
 export const UI_SKILL_LEVEL_WIDTH = '16%'
 export const UI_SKILL_XP_BAR_HEIGHT = '16%'
 export const UI_SKILL_XP_BAR_MARGIN_TOP = '4%'
+export const UI_SKILL_DOUBLE_XP_ROW_HEIGHT = '3vh'
+export const UI_SKILL_DOUBLE_XP_FONT_SIZE = 20
 export const UI_GUNNER_ICON_PATH = 'assets/scene/Images/gunner.png'
 export const UI_ENGINEERING_ICON_PATH = 'assets/scene/Images/engineering.png'
 

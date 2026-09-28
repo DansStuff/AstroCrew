@@ -17,7 +17,14 @@ import {
   snapshotMission,
   stringifyContributions
 } from '../players/contributions'
-import { awardSkillXp, flushPlayerStats, getEngineeringLevel, onPlayerConnected } from '../players/stats'
+import {
+  awardSkillXp,
+  beginMissionDoubleXp,
+  endMissionDoubleXp,
+  flushPlayerStats,
+  getEngineeringLevel,
+  onPlayerConnected
+} from '../players/stats'
 import {
   activateOvercharge,
   applyEncounterActive,
@@ -109,6 +116,7 @@ function publishWeeklyBoard(to?: string): void {
 
 function finishRound(won: boolean): void {
   void flushPlayerStats()
+  endMissionDoubleXp()
   const mission = snapshotMission(won)
   console.log(`[SERVER] Round contributions (${won ? 'win' : 'loss'}): ${stringifyContributions()}`)
   notifyRoundResults({
@@ -131,6 +139,7 @@ function applyTransition(from: MissionState, to: MissionState, event: MissionEve
 
   if (event.type === 'MISSION_START') {
     resetContributions()
+    beginMissionDoubleXp()
     applyMissionStarted(PATH_START_STOP_ID)
     resumeFromStop()
     notifyMissionStart()
