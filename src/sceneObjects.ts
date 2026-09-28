@@ -67,6 +67,8 @@ export type TurretView = {
   look: Vector3
   /** Scene-space origin for lasers fired from this weapon. */
   muzzle: Vector3
+  /** Console the gunner stands at. Projection rays start here, below the camera. */
+  aimOrigin?: Vector3
 }
 
 const turretViews = new Map<TurretId, TurretView>()
@@ -500,7 +502,12 @@ export function setupSceneObjects(): void {
 
   for (const console of consoles) {
     const weaponName = console.name.replace(/Console$/, '')
-    initConsole(console.entity, cameras.get(weaponName), turretIdFromWeaponName(weaponName))
+    const turretId = turretIdFromWeaponName(weaponName)
+    const view = turretId ? turretViews.get(turretId) : undefined
+    if (view) {
+      view.aimOrigin = Vector3.clone(getWorldPosition(engine, console.entity))
+    }
+    initConsole(console.entity, cameras.get(weaponName), turretId)
   }
 
   function attachSceneObjectPointerEvents(): void {

@@ -7,7 +7,8 @@ import { engine, PlayerIdentityData } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
 import {
-  HAZARD_CONE_VERTICAL_DEGREES,
+  ASTEROID_SPAWN_SPREAD_X_DEGREES,
+  ASTEROID_SPAWN_SPREAD_Y_DEGREES,
   HAZARD_DAMAGE_INTERVAL,
   HAZARD_SPAWN_DISTANCE,
   OVERCHARGE_DAMAGE_MULTIPLIER,
@@ -16,7 +17,6 @@ import {
   SAUCER_FIRE_INTERVAL,
   SAUCER_HOVER_DISTANCE,
   SKILL_XP_PER_GUNNER_HIT,
-  TURRET_SPAWN_FRUSTUM,
   gunnerShotDamage,
   playerCountDamageMultiplier,
   type HazardKind,
@@ -98,22 +98,24 @@ export function configureHazardNotifies(next: HazardNotifies): void {
   notifies = next
 }
 
-function directionInTurretView(turret: TurretId): Vector3 {
+/**
+ * Unit direction in virtual space from the weapon camera.
+ * `yawDegrees` is left/right and `pitchDegrees` is up, both in the camera frame (+X right, +Y up, +Z look).
+ */
+function directionInTurretView(turret: TurretId, yawDegrees = 0, pitchDegrees = 0): Vector3 {
   const view = getTurretView(turret)
-  const look = view ? view.look : Vector3.Forward()
-  const upRef = Math.abs(Vector3.dot(look, Vector3.Up())) > 0.99 ? Vector3.Right() : Vector3.Up()
-  const right = Vector3.normalize(Vector3.cross(upRef, look))
-  const up = Vector3.normalize(Vector3.cross(look, right))
-
-  const yawHalf = (TURRET_SPAWN_FRUSTUM.horizontalFovDegrees * TURRET_SPAWN_FRUSTUM.inset * 0.5) * (Math.PI / 180)
-  const yaw = (Math.random() * 2 - 1) * yawHalf
-  const pitch = Math.random() * HAZARD_CONE_VERTICAL_DEGREES * (Math.PI / 180)
+  const yaw = (yawDegrees * Math.PI) / 180
+  const pitch = (pitchDegrees * Math.PI) / 180
   const cosPitch = Math.cos(pitch)
-  const sceneDir = Vector3.add(
-    Vector3.add(Vector3.scale(right, Math.sin(yaw) * cosPitch), Vector3.scale(up, Math.sin(pitch))),
-    Vector3.scale(look, Math.cos(yaw) * cosPitch)
-  )
-  return Vector3.rotate(Vector3.normalize(sceneDir), shipVirtualRotation)
+  const local = Vector3.create(Math.sin(yaw) * cosPitch, Math.sin(pitch), Math.cos(yaw) * cosPitch)
+  const sceneDirection = view ? Vector3.rotate(local, view.rotation) : local
+  return Vector3.rotate(sceneDirection, shipVirtualRotation)
+}
+
+function asteroidSpawnDirection(turret: TurretId): Vector3 {
+  const yaw = (Math.random() * 2 - 1) * ASTEROID_SPAWN_SPREAD_X_DEGREES
+  const pitch = Math.random() * ASTEROID_SPAWN_SPREAD_Y_DEGREES
+  return directionInTurretView(turret, yaw, pitch)
 }
 
 function remainingFlightTime(hazard: LiveHazard): number {
@@ -224,7 +226,9 @@ function nextBase(encounterId: string, position: Vector3, hp: number): HazardBas
 }
 
 export function spawn(encounterId: string, opts: SpawnHazardOpts): number {
-  const position = Vector3.add(shipVirtualPosition, Vector3.scale(directionInTurretView(opts.turret), HAZARD_SPAWN_DISTANCE))
+  const direction =
+    opts.kind === 'asteroid' ? asteroidSpawnDirection(opts.turret) : directionInTurretView(opts.turret)
+  const position = Vector3.add(shipVirtualPosition, Vector3.scale(direction, HAZARD_SPAWN_DISTANCE))
   const base = nextBase(encounterId, position, opts.hp)
   const hazard: LiveHazard =
     opts.kind === 'asteroid'

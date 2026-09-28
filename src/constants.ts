@@ -115,7 +115,7 @@ export const SAUCER_APPROACH_SECONDS = 2
 /** Seconds between saucer shots. First shot waits one full interval after approach. */
 export const SAUCER_FIRE_INTERVAL = 2
 /** Seconds an asteroid exists before it hits the ship (unless shot). */
-export const ASTEROID_FLIGHT_TIME = 9
+export const ASTEROID_FLIGHT_TIME = 11
 
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   'encounter-1': {
@@ -314,11 +314,15 @@ export const HAZARD_RADIUS = 4
 /** Virtual-space distance ahead of the ship to place a spawned hazard. */
 export const HAZARD_SPAWN_DISTANCE = 240
 
+/**
+ * Asteroid spawn offset from the weapon camera look, in degrees.
+ * X is left/right (±). Y is up from the look axis (0 through +max).
+ */
+export const ASTEROID_SPAWN_SPREAD_X_DEGREES = 15
+export const ASTEROID_SPAWN_SPREAD_Y_DEGREES = 20
+
 /** Virtual-space distance from the ship at the end of an asteroid's flight. */
 export const HAZARD_IMPACT_DISTANCE = 8
-
-/** Upward-only spawn pitch, degrees above the turret look axis. Sampled from 0 to this value. */
-export const HAZARD_CONE_VERTICAL_DEGREES = 20
 
 /** Local tumble rate applied on top of celestial orientation. */
 export const HAZARD_SPIN_DEGREES_PER_SECOND = 60
@@ -447,13 +451,6 @@ export const WEAPON_LIGHT_OVERCHARGE_COLOR = Color3.create(0.85, 0, 1)
 export const SHIP_LASER_EMISSIVE_INTENSITY = 4
 
 // MARK: Encounters
-
-/** Horizontal spawn frustum around a cached gun look. Vertical uses HAZARD_CONE_VERTICAL_DEGREES. */
-export const TURRET_SPAWN_FRUSTUM = {
-  /** 16:9 @ 60 vFOV is ~91; 80 keeps rocks off the bezel. */
-  horizontalFovDegrees: 80,
-  inset: 0.55
-}
 
 export const ENCOUNTER_STAGE_SOUND_PATH = 'assets/scene/Sounds/fail1.mp3'
 

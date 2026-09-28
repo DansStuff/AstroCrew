@@ -1,48 +1,20 @@
-double xp
-
-  -store timestamp of player last playtime and determine double xp based on that.
-
-
-
-
 week 5-6
 
 need to test multiplayer shooting
 
 replace planet models -doneish
 
-onboarding (maybe just add a splash screen)
 
 
 
 
-
-
-
-
-
-ship explosion - important
-
-
-
-
-
-
-
-
-
-
-
-double xp - important
-
-
-
-
+ship explosion - importantwa
 
 
 
 game balance pass
-  maybe slow asteroids a bit
+
+
 
 sounds: weapon powerup
         low hp claxons
@@ -52,5 +24,10 @@ sounds: weapon powerup
 -optimize laser gun
 -animate miniship
 
+leaderboard models
+update weapon console models
+update camera overlay
 
+check asteroid spawning cone
 
+onboarding (maybe just add a splash screen) (need final models for consoles)

@@ -9,7 +9,7 @@ export const PlayerStats = engine.defineComponent('game:PlayerStats', {
   engineeringLevel: Schemas.Int,
   gunnerXp: Schemas.Int,
   engineeringXp: Schemas.Int,
-  lastXpAt: Schemas.Int64,
+  lastMissionAt: Schemas.Int64,
   doubleXpMission: Schemas.Boolean
 })
 
@@ -19,7 +19,7 @@ export type PlayerStatsSnapshot = {
   engineeringLevel: number
   gunnerXp: number
   engineeringXp: number
-  lastXpAt: number
+  lastMissionAt: number
   doubleXpMission: boolean
 }
 
@@ -32,7 +32,7 @@ export const DEFAULT_PLAYER_STATS: Omit<PlayerStatsSnapshot, 'playerId'> = {
   engineeringLevel: 1,
   gunnerXp: 0,
   engineeringXp: 0,
-  lastXpAt: 0,
+  lastMissionAt: 0,
   doubleXpMission: false
 }
 
@@ -73,7 +73,7 @@ function defaultSnapshot(playerId: string): PlayerStatsSnapshot {
     engineeringLevel: DEFAULT_PLAYER_STATS.engineeringLevel,
     gunnerXp: DEFAULT_PLAYER_STATS.gunnerXp,
     engineeringXp: DEFAULT_PLAYER_STATS.engineeringXp,
-    lastXpAt: DEFAULT_PLAYER_STATS.lastXpAt,
+    lastMissionAt: DEFAULT_PLAYER_STATS.lastMissionAt,
     doubleXpMission: DEFAULT_PLAYER_STATS.doubleXpMission
   }
 }
@@ -85,15 +85,15 @@ function utcDayId(ms: number): string {
   return `${date.getUTCFullYear()}-${month}-${day}`
 }
 
-function receivedXpToday(lastXpAt: number, nowMs: number): boolean {
-  return lastXpAt > 0 && utcDayId(lastXpAt) === utcDayId(nowMs)
+function startedMissionToday(lastMissionAt: number, nowMs: number): boolean {
+  return lastMissionAt > 0 && utcDayId(lastMissionAt) === utcDayId(nowMs)
 }
 
 export function isDoubleXpAvailable(
-  stats: Pick<PlayerStatsSnapshot, 'lastXpAt' | 'doubleXpMission'>,
+  stats: Pick<PlayerStatsSnapshot, 'lastMissionAt' | 'doubleXpMission'>,
   nowMs: number = Date.now()
 ): boolean {
-  return stats.doubleXpMission || !receivedXpToday(stats.lastXpAt, nowMs)
+  return stats.doubleXpMission || !startedMissionToday(stats.lastMissionAt, nowMs)
 }
 
 function xpBase(skill: SkillId): number {
@@ -202,6 +202,7 @@ function parseStoredStats(raw: unknown): StoredStats | null {
       engineeringLevel?: unknown
       gunnerXp?: unknown
       engineeringXp?: unknown
+      lastMissionAt?: unknown
       lastXpAt?: unknown
     }
     const gunnerLevel = parseLevel(parsed.gunnerLevel)
@@ -212,7 +213,7 @@ function parseStoredStats(raw: unknown): StoredStats | null {
       engineeringLevel,
       gunnerXp: parseXp(parsed.gunnerXp),
       engineeringXp: parseXp(parsed.engineeringXp),
-      lastXpAt: parseTimestamp(parsed.lastXpAt)
+      lastMissionAt: parseTimestamp(parsed.lastMissionAt ?? parsed.lastXpAt)
     }
   } catch {
     return null
@@ -239,7 +240,7 @@ function storedStatsPayload(stats: StoredStats): string {
     engineeringLevel: stats.engineeringLevel,
     gunnerXp: stats.gunnerXp,
     engineeringXp: stats.engineeringXp,
-    lastXpAt: stats.lastXpAt
+    lastMissionAt: stats.lastMissionAt
   })
 }
 
@@ -285,7 +286,7 @@ async function loadPlayerStats(key: string): Promise<void> {
     mutable.gunnerXp = gunner.xp
     mutable.engineeringLevel = engineering.level
     mutable.engineeringXp = engineering.xp
-    mutable.lastXpAt = hadPending ? Date.now() : base.lastXpAt
+    mutable.lastMissionAt = base.lastMissionAt
   }
 
   const storedWasInvalid = result.kind === 'found' && stored === null
@@ -343,7 +344,6 @@ export function awardSkillXp(playerAddress: string, skill: SkillId, amount: numb
     mutable.engineeringLevel = next.level
     mutable.engineeringXp = next.xp
   }
-  mutable.lastXpAt = Date.now()
 
   const entry = statsEntries.get(statsKey(playerAddress))
   if (!entry) return
@@ -356,15 +356,18 @@ export function awardSkillXp(playerAddress: string, skill: SkillId, amount: numb
   }
 }
 
-/** Flags loaded players who have not received XP this UTC day; late joiners and loaders are not flagged. */
+/** Flags loaded players who have not started a mission this UTC day, and stamps that start time. */
 export function beginMissionDoubleXp(): void {
   if (!isServer()) return
   const now = Date.now()
   const flagged: string[] = []
   for (const entry of statsEntries.values()) {
+    if (entry.status !== 'loaded') continue
     const mutable = PlayerStats.getMutableOrNull(getOrCreatePlayerEntity(entry.address))
     if (!mutable) continue
-    mutable.doubleXpMission = entry.status === 'loaded' && !receivedXpToday(mutable.lastXpAt, now)
+    mutable.doubleXpMission = !startedMissionToday(mutable.lastMissionAt, now)
+    mutable.lastMissionAt = now
+    entry.dirty = true
     if (mutable.doubleXpMission) flagged.push(entry.address)
   }
   console.log(`[SERVER] Double XP this mission: ${flagged.length > 0 ? flagged.join(', ') : 'none'}`)
