@@ -28,6 +28,7 @@
 	],
 	"materials":[
 		{
+			"alphaMode":"BLEND",
 			"doubleSided":true,
 			"emissiveFactor":[
 				0,
@@ -39,13 +40,13 @@
 					"emissiveStrength":1.5
 				}
 			},
-			"name":"Material.007",
+			"name":"Miniship",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
 					0.00035462965024635196,
 					0.8002511262893677,
 					0,
-					1
+					0.17605635523796082
 				],
 				"metallicFactor":0
 			}

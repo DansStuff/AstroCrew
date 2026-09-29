@@ -29,6 +29,14 @@ import {
   UI_OVERCHARGE_LABEL_HEIGHT,
   UI_OVERCHARGE_LABEL_MARGIN_TOP,
   UI_OVERCHARGE_LABEL_WIDTH,
+  UI_SELECT_TARGET_BLINK_MS,
+  UI_SELECT_TARGET_FONT_SIZE,
+  UI_SELECT_TARGET_LABEL_HEIGHT,
+  UI_SELECT_TARGET_LABEL_WIDTH,
+  UI_CAM_INDICATOR_BOTTOM,
+  UI_CAM_INDICATOR_LEFT,
+  UI_CAM_INDICATOR_PATHS,
+  UI_CAM_INDICATOR_SIZE,
   UI_TURRET_CROSSHAIR_PATH,
   UI_TURRET_CROSSHAIR_SLICES,
   UI_TURRET_CROSSHAIR_WIDTH,
@@ -40,7 +48,8 @@ import {
 import { getGameState, isWeaponsOvercharged } from './gamestate'
 import { room } from './networking/messages'
 import { lastStopId } from './path/follow'
-import { exitWeaponCamera, isTurretOccupied } from './sceneObjects'
+import { getLocalTargetTurret } from './hazards/targeting'
+import { exitWeaponCamera, getOccupiedTurret, isTurretOccupied } from './sceneObjects'
 import { GreenPixelButton } from './ui/greenPixelFrame'
 import { RoundResultsUi, setupRoundResultsUi } from './ui/roundResults'
 import { SkillLevelsHud } from './ui/skillLevels'
@@ -110,6 +119,20 @@ function requestNewMission() {
 
 function requestLeaveTurret() {
   exitWeaponCamera()
+}
+
+function camIndicatorSrc(): string {
+  const turret = getOccupiedTurret()
+  if (!turret) return UI_CAM_INDICATOR_PATHS.center
+  return UI_CAM_INDICATOR_PATHS[turret]
+}
+
+function showingSelectTarget(): boolean {
+  return isTurretOccupied() && getLocalTargetTurret() === null
+}
+
+function selectTargetBlinkOn(): boolean {
+  return Math.floor(Date.now() / UI_SELECT_TARGET_BLINK_MS) % 2 === 0
 }
 
 function inMissionHud() {
@@ -211,6 +234,48 @@ export const uiMenu = () => {
         textureSlices: UI_TURRET_CROSSHAIR_SLICES
       }}
     />
+
+    <UiEntity
+      uiTransform={{
+        width: UI_CAM_INDICATOR_SIZE,
+        height: UI_CAM_INDICATOR_SIZE,
+        positionType: 'absolute',
+        position: { bottom: UI_CAM_INDICATOR_BOTTOM, left: UI_CAM_INDICATOR_LEFT },
+        display: isTurretOccupied() ? 'flex' : 'none',
+        pointerFilter: 'none'
+      }}
+      uiBackground={{
+        texture: { src: camIndicatorSrc() },
+        textureMode: 'stretch'
+      }}
+    />
+
+    <UiEntity
+      uiTransform={{
+        width: '100%',
+        height: UI_SELECT_TARGET_LABEL_HEIGHT,
+        positionType: 'absolute',
+        position: { bottom: UI_HUD_EDGE_PADDING_Y, left: 0 },
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: showingSelectTarget() ? 'flex' : 'none',
+        opacity: selectTargetBlinkOn() ? 1 : 0,
+        pointerFilter: 'none'
+      }}
+    >
+      <Label
+        value={boldUi('SELECT TARGET')}
+        font={UI_FONT}
+        fontSize={UI_SELECT_TARGET_FONT_SIZE}
+        color={UI_TINT}
+        textAlign="middle-center"
+        uiTransform={{
+          width: UI_SELECT_TARGET_LABEL_WIDTH,
+          height: '100%',
+          pointerFilter: 'none'
+        }}
+      />
+    </UiEntity>
 
     <GreenPixelButton
       value="Exit Camera"

@@ -27,7 +27,14 @@ import {
   UI_SKILL_XP_BAR_HEIGHT,
   UI_SKILL_XP_BAR_MARGIN_TOP
 } from '../constants'
-import { DEFAULT_PLAYER_STATS, getPlayerStats, isDoubleXpAvailable, skillProgress } from '../players/stats'
+import {
+  DEFAULT_PLAYER_STATS,
+  getPlayerStats,
+  isDoubleXpAvailable,
+  msUntilNextUtcDay,
+  skillProgress,
+  type PlayerStatsSnapshot
+} from '../players/stats'
 import { GreenPixelFrame } from './greenPixelFrame'
 
 const XP_BAR_TRACK = Color4.create(0.03, 0.04, 0.03, 1)
@@ -58,6 +65,20 @@ function localSkillLevels() {
   const me = getPlayer()
   if (!me) return DEFAULT_PLAYER_STATS
   return getPlayerStats(me.userId)
+}
+
+function formatCountdown(ms: number): string {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000))
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+}
+
+function doubleXpLabel(stats: Pick<PlayerStatsSnapshot, 'lastMissionAt' | 'doubleXpMission'>): string {
+  if (isDoubleXpAvailable(stats)) return 'Double XP Active!'
+  return `Double XP available in ${formatCountdown(msUntilNextUtcDay())}`
 }
 
 function SkillRow(iconSrc: string, label: string, level: number, progress: number, key: string) {
@@ -179,7 +200,7 @@ export function SkillLevelsHud() {
           )}
           {emptySkillRows()}
           <Label
-            value={boldUi(isDoubleXpAvailable(stats) ? 'Double XP Available!' : 'Double XP available at 0:00 UTC')}
+            value={boldUi(doubleXpLabel(stats))}
             font={UI_FONT}
             fontSize={UI_SKILL_DOUBLE_XP_FONT_SIZE}
             color={UI_TINT}

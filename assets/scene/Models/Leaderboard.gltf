@@ -23,9 +23,9 @@
 				0.4999999701976776
 			],
 			"scale":[
-				0.49780070781707764,
-				1,
-				0.49780070781707764
+				0.44425302743911743,
+				0.9032776951789856,
+				0.44425302743911743
 			],
 			"translation":[
 				-10.603378295898438,
@@ -49,7 +49,7 @@
 				0.12257240001220104,
 				0.800000011920929
 			],
-			"name":"Material.005",
+			"name":"ScoreboardHighlight",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
 					0,
@@ -62,7 +62,7 @@
 		},
 		{
 			"doubleSided":true,
-			"name":"Material.006",
+			"name":"ScoreboardBackground",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
 					0.04861366003751755,
@@ -101,6 +101,15 @@
 					},
 					"indices":7,
 					"material":1
+				},
+				{
+					"attributes":{
+						"POSITION":8,
+						"NORMAL":9,
+						"TEXCOORD_0":10
+					},
+					"indices":11,
+					"material":0
 				}
 			]
 		}
@@ -109,14 +118,14 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":315,
+			"count":281,
 			"max":[
-				7.547000408172607,
+				8.485000610351562,
 				0,
 				0.009000000543892384
 			],
 			"min":[
-				0.04800000041723251,
+				0,
 				0,
 				-0.6910000443458557
 			],
@@ -125,25 +134,25 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":315,
+			"count":281,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":315,
+			"count":281,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":909,
+			"count":789,
 			"type":"SCALAR"
 		},
 		{
 			"bufferView":4,
 			"componentType":5126,
-			"count":24,
+			"count":8,
 			"max":[
 				-10.633827209472656,
 				5.570071220397949,
@@ -159,75 +168,133 @@
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":24,
+			"count":8,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":6,
 			"componentType":5126,
-			"count":24,
+			"count":8,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":7,
 			"componentType":5123,
-			"count":36,
+			"count":12,
+			"type":"SCALAR"
+		},
+		{
+			"bufferView":8,
+			"componentType":5126,
+			"count":16,
+			"max":[
+				-10.633827209472656,
+				5.570071220397949,
+				7.894113540649414
+			],
+			"min":[
+				-10.765175819396973,
+				-0.7665873169898987,
+				3.711763381958008
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":9,
+			"componentType":5126,
+			"count":16,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":10,
+			"componentType":5126,
+			"count":16,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":11,
+			"componentType":5123,
+			"count":24,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":3780,
+			"byteLength":3372,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":3780,
-			"byteOffset":3780,
+			"byteLength":3372,
+			"byteOffset":3372,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":2520,
-			"byteOffset":7560,
+			"byteLength":2248,
+			"byteOffset":6744,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":1818,
-			"byteOffset":10080,
+			"byteLength":1578,
+			"byteOffset":8992,
 			"target":34963
 		},
 		{
 			"buffer":0,
-			"byteLength":288,
-			"byteOffset":11900,
+			"byteLength":96,
+			"byteOffset":10572,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":288,
-			"byteOffset":12188,
+			"byteLength":96,
+			"byteOffset":10668,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":64,
+			"byteOffset":10764,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":24,
+			"byteOffset":10828,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":192,
+			"byteOffset":10852,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":192,
-			"byteOffset":12476,
+			"byteOffset":11044,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":72,
-			"byteOffset":12668,
+			"byteLength":128,
+			"byteOffset":11236,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":11364,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":12740,
+			"byteLength":11412,
 			"uri":"Leaderboard.bin"
 		}
 	]

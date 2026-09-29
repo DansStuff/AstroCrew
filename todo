@@ -16,18 +16,15 @@ game balance pass
 
 
 
-sounds: weapon powerup
+sounds: weapon powerup ***
         low hp claxons
 
 
 -player animations
--optimize laser gun
 -animate miniship
 
-leaderboard models
-update weapon console models
-update camera overlay
-
-check asteroid spawning cone
-
 onboarding (maybe just add a splash screen) (need final models for consoles)
+
+make sure damage penalty per player is capped at sensible number
+
+add planet names

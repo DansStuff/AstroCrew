@@ -489,6 +489,23 @@ export const UI_TURRET_CROSSHAIR_WIDTH = '74%'
 /** Full screen height inset by UI_HUD_EDGE_PADDING_Y top and bottom. */
 export const UI_TURRET_CROSSHAIR_HEIGHT = '86%'
 
+// Which turret camera is active, drawn inside the crosshair frame's bottom-left corner.
+export const UI_CAM_INDICATOR_PATHS: Record<TurretId, string> = {
+  left: 'assets/scene/Images/cam_indicator_left.png',
+  center: 'assets/scene/Images/cam_indicator_center.png',
+  right: 'assets/scene/Images/cam_indicator_right.png'
+}
+/** Both axes are this share of screen height, so the art stays square when the mobile virtual canvas is shorter than desktop. */
+export const UI_CAM_INDICATOR_SIZE = '22.22vh'
+export const UI_CAM_INDICATOR_LEFT = 180
+export const UI_CAM_INDICATOR_BOTTOM = 220
+
+// Prompt while a turret camera is up and nothing is locked
+export const UI_SELECT_TARGET_FONT_SIZE = 32
+export const UI_SELECT_TARGET_LABEL_WIDTH = '36%'
+export const UI_SELECT_TARGET_LABEL_HEIGHT = '6vh'
+export const UI_SELECT_TARGET_BLINK_MS = 500
+
 // Hull bar
 export const UI_HEALTH_BAR_WIDTH = '30%'
 export const UI_HEALTH_BAR_HEIGHT = '4%'

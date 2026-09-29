@@ -118,7 +118,7 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":2462,
+			"count":884,
 			"max":[
 				2.507181167602539,
 				5.209314823150635,
@@ -134,28 +134,28 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":2462,
+			"count":884,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":2462,
+			"count":884,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":12084,
+			"count":3882,
 			"type":"SCALAR"
 		},
 		{
 			"bufferView":4,
 			"componentType":5126,
-			"count":441,
+			"count":144,
 			"max":[
 				2.3436696529388428,
-				2.5404748916625977,
+				2.5257606506347656,
 				1.0473579168319702
 			],
 			"min":[
@@ -168,75 +168,75 @@
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":441,
+			"count":144,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":6,
 			"componentType":5126,
-			"count":441,
+			"count":144,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":7,
 			"componentType":5123,
-			"count":1728,
+			"count":432,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":29544,
+			"byteLength":10608,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":29544,
-			"byteOffset":29544,
+			"byteLength":10608,
+			"byteOffset":10608,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":19696,
-			"byteOffset":59088,
+			"byteLength":7072,
+			"byteOffset":21216,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":24168,
-			"byteOffset":78784,
+			"byteLength":7764,
+			"byteOffset":28288,
 			"target":34963
 		},
 		{
 			"buffer":0,
-			"byteLength":5292,
-			"byteOffset":102952,
+			"byteLength":1728,
+			"byteOffset":36052,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":5292,
-			"byteOffset":108244,
+			"byteLength":1728,
+			"byteOffset":37780,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":3528,
-			"byteOffset":113536,
+			"byteLength":1152,
+			"byteOffset":39508,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":3456,
-			"byteOffset":117064,
+			"byteLength":864,
+			"byteOffset":40660,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":120520,
+			"byteLength":41524,
 			"uri":"EnergyWeapon3.bin"
 		}
 	]

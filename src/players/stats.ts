@@ -89,6 +89,12 @@ function startedMissionToday(lastMissionAt: number, nowMs: number): boolean {
   return lastMissionAt > 0 && utcDayId(lastMissionAt) === utcDayId(nowMs)
 }
 
+/** Milliseconds until the next 00:00 UTC, when the daily double-XP mission resets. */
+export function msUntilNextUtcDay(nowMs: number = Date.now()): number {
+  const date = new Date(nowMs)
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1) - nowMs
+}
+
 export function isDoubleXpAvailable(
   stats: Pick<PlayerStatsSnapshot, 'lastMissionAt' | 'doubleXpMission'>,
   nowMs: number = Date.now()
