@@ -1659,13 +1659,21 @@
           "json": {
             "name": "Astro Crew",
             "description": "Defend the ship!",
-            "thumbnail": "assets/scene/Images/blender_6fR8uFrIzt.png",
+            "thumbnail": "assets/images/thumbnail.png",
             "ageRating": "A",
-            "categories": [],
-            "author": "DanL",
+            "categories": [
+              "game"
+            ],
+            "author": "Dan",
             "email": "",
-            "tags": [],
+            "tags": [
+              ""
+            ],
             "layout": {
+              "base": {
+                "x": 0,
+                "y": 0
+              },
               "parcels": [
                 {
                   "x": 0,
@@ -1955,11 +1963,7 @@
                   "x": 7,
                   "y": 0
                 }
-              ],
-              "base": {
-                "x": 0,
-                "y": 0
-              }
+              ]
             },
             "silenceVoiceChat": false,
             "disablePortableExperiences": false,
@@ -1976,11 +1980,8 @@
                     ]
                   },
                   "y": {
-                    "$case": "range",
-                    "value": [
-                      63.58000183105469,
-                      63.58000183105469
-                    ]
+                    "$case": "single",
+                    "value": 63.58000183105469
                   },
                   "z": {
                     "$case": "range",
@@ -1998,7 +1999,8 @@
               }
             ],
             "skyboxConfig": {
-              "fixedTime": 86340
+              "fixedTime": 86340,
+              "transitionMode": 0
             },
             "creator": "",
             "disableNearbyVoiceChat": false,

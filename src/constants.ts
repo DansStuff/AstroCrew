@@ -71,13 +71,13 @@ export const GUNNER_BASE_DAMAGE = 10
 export const GUNNER_DAMAGE_PER_LEVEL = 2
 
 /** HP of an asteroid at encounter hpMultiplier 1. Level 1 TTK is 5s (10 ticks × 10 damage). */
-export const BASE_ASTEROID_HP = 100
+export const BASE_ASTEROID_HP = 90
 /** Hull damage when an asteroid reaches the ship at encounter damageMultiplier 1. */
 export const BASE_ASTEROID_DAMAGE = 10
 /** HP of a saucer at encounter hpMultiplier 1. Level 1 TTK is 6s (12 ticks × 10 damage). */
-export const BASE_SAUCER_HP = 120
+export const BASE_SAUCER_HP = 150
 /** Hull damage per saucer shot at encounter damageMultiplier 1. */
-export const BASE_SAUCER_DAMAGE = 10
+export const BASE_SAUCER_DAMAGE = 8
 
 export function gunnerShotDamage(level: number): number {
   return GUNNER_BASE_DAMAGE + (level - 1) * GUNNER_DAMAGE_PER_LEVEL
@@ -137,11 +137,12 @@ export const SAUCER_APPROACH_SECONDS = 2
 /** Seconds between saucer shots. First shot waits one full interval after approach. */
 export const SAUCER_FIRE_INTERVAL = 2
 /** Seconds an asteroid exists before it hits the ship (unless shot). */
-export const ASTEROID_FLIGHT_TIME = 12
-/*
+export const ASTEROID_FLIGHT_TIME = 11
+
+// HP multipliers run linearly from 0.8 to 3 across the seven stops. Drenovar overrides the final 3.
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   Terra: {
-    hpMultiplier: 1,
+    hpMultiplier: 0.8,
     damageMultiplier: 1,
     stages: [
 
@@ -151,7 +152,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
     ]
   },
   Vaelith: {
-    hpMultiplier: 1.33,
+    hpMultiplier: 1.17,
     damageMultiplier: 1.17,
     stages: [
       { kind: 'saucer', turret: 'center' },
@@ -160,7 +161,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
     ]
   },
   Korund: {
-    hpMultiplier: 1.67,
+    hpMultiplier: 1.53,
     damageMultiplier: 1.33,
     stages: [
       { kind: 'asteroid', turret: 'right', hazardCount: 4 },
@@ -169,7 +170,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
     ]
   },
   Sablemere: {
-    hpMultiplier: 2,
+    hpMultiplier: 1.9,
     damageMultiplier: 1.5,
     stages: [
       { kind: 'asteroid', turret: 'right', hazardCount: 4 },
@@ -178,7 +179,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
     ]
   },
   Orpheon: {
-    hpMultiplier: 2.33,
+    hpMultiplier: 2.27,
     damageMultiplier: 1.67,
     stages: [
       { kind: 'saucer', turret: 'right' },
@@ -188,15 +189,15 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
     ]
   },
   Caelum: {
-    hpMultiplier: 2.67,
+    hpMultiplier: 2.63,
     damageMultiplier: 1.83,
     stages: [
-      { kind: 'asteroid', turret: 'left', hazardCount: 6 },
-      { kind: 'asteroid', turret: 'right', hazardCount: 6 },
-      { kind: 'asteroid', turret: 'center', hazardCount: 6 },
-      { kind: 'asteroid', turret: 'left', hazardCount: 6 },
-      { kind: 'asteroid', turret: 'right', hazardCount: 6 },
-      { kind: 'asteroid', turret: 'center', hazardCount: 6 }
+      { kind: 'asteroid', turret: 'left', hazardCount: 4 },
+      { kind: 'asteroid', turret: 'right', hazardCount: 4 },
+      { kind: 'asteroid', turret: 'center', hazardCount: 4 },
+      { kind: 'asteroid', turret: 'left', hazardCount: 4 },
+      { kind: 'asteroid', turret: 'right', hazardCount: 4 },
+      { kind: 'asteroid', turret: 'center', hazardCount: 4 }
     ]
   },
   Drenovar: {
@@ -207,8 +208,8 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
     ]
   }
 }
-*/
 
+/*
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   Terra: {
     hpMultiplier: 1,
@@ -262,7 +263,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
     ]
   }
 }
-
+*/
 
 // MARK: Ship
 
