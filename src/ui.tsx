@@ -1,3 +1,4 @@
+import { engine } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import { isStateSyncronized } from '@dcl/sdk/network'
 import { getPlayer } from '@dcl/sdk/players'
@@ -27,6 +28,7 @@ import {
   UI_ENCOUNTER_STAGE_DURATION_SECONDS,
   UI_ENCOUNTER_STAGE_FONT_SIZE,
   UI_ENCOUNTER_STAGE_LABEL_HEIGHT,
+  UI_ENCOUNTER_STAGE_LABEL_TOP,
   UI_ENCOUNTER_STAGE_LABEL_WIDTH,
   UI_OVERCHARGE_LABEL_FONT_SIZE,
   UI_OVERCHARGE_LABEL_HEIGHT,
@@ -53,6 +55,7 @@ import { room } from './networking/messages'
 import { lastStopId } from './path/follow'
 import { getLocalTargetTurret } from './hazards/targeting'
 import { exitWeaponCamera, getOccupiedTurret, isTurretOccupied, repairHoldRemaining } from './sceneObjects'
+import { BreachIconsHud } from './ui/breachIcons'
 import { GreenPixelButton } from './ui/greenPixelFrame'
 import { RoundResultsUi, setupRoundResultsUi } from './ui/roundResults'
 import { SkillLevelsHud } from './ui/skillLevels'
@@ -104,6 +107,12 @@ function hullPercent(): number {
 
 export function setupUi() {
   ReactEcsRenderer.setUiRenderer(uiMenu, { virtualWidth: UI_VIRTUAL_WIDTH, virtualHeight: UI_VIRTUAL_HEIGHT })
+  // Full-screen renderer (no safe-area inset) so edge icons sit on the true screen edges.
+  ReactEcsRenderer.addUiRenderer(engine.addEntity(), breachIconsUi, {
+    virtualWidth: UI_VIRTUAL_WIDTH,
+    virtualHeight: UI_VIRTUAL_HEIGHT,
+    screenInset: 'none'
+  })
   setupRoundResultsUi()
   room.onMessage('notifyWeaponsOvercharged', (data) => {
     overchargePlayerName = playerDisplayName(data.playerId)
@@ -170,7 +179,7 @@ function RepairHoldBar() {
           uiBackground={{ color: UI_TINT }}
         />
         <Label
-          value={boldUi('hold')}
+          value={boldUi('Hold')}
           font={UI_FONT}
           fontSize={UI_REPAIR_HOLD_BAR_FONT_SIZE}
           color={Color4.Black()}
@@ -188,6 +197,12 @@ function RepairHoldBar() {
   )
 }
 
+
+const breachIconsUi = () => (
+  <UiEntity uiTransform={{ width: '100%', height: '100%', pointerFilter: 'none' }}>
+    <BreachIconsHud />
+  </UiEntity>
+)
 
 export const uiMenu = () => {
 
@@ -307,16 +322,16 @@ export const uiMenu = () => {
         position: { bottom: UI_HUD_EDGE_PADDING_Y, left: 0 },
         justifyContent: 'center',
         alignItems: 'center',
-        display: showingSelectTarget() ? 'flex' : 'none',
+        display: isTurretOccupied() ? 'flex' : 'none',
         opacity: selectTargetBlinkOn() ? 1 : 0,
         pointerFilter: 'none'
       }}
     >
       <Label
-        value={boldUi('SELECT TARGET')}
+        value={boldUi(showingSelectTarget() ? 'SELECT TARGET' : 'TURRET ENGAGING')}
         font={UI_FONT}
         fontSize={UI_SELECT_TARGET_FONT_SIZE}
-        color={UI_TINT}
+        color={showingSelectTarget() ? UI_TINT : Color4.Red()}
         textAlign="middle-center"
         uiTransform={{
           width: UI_SELECT_TARGET_LABEL_WIDTH,
@@ -347,18 +362,19 @@ export const uiMenu = () => {
     <UiEntity
       uiTransform={{
         width: '100%',
-        height: '100%',
+        height: UI_ENCOUNTER_STAGE_LABEL_HEIGHT,
         positionType: 'absolute',
-        position: { top: 0, left: 0 },
+        position: { top: UI_ENCOUNTER_STAGE_LABEL_TOP, left: 0 },
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        pointerFilter: 'none'
       }}
     >
       <Label
         value={boldUi(encounterStageLabel())}
         font={UI_FONT}
         fontSize={UI_ENCOUNTER_STAGE_FONT_SIZE}
-        color={UI_TINT}
+        color={Color4.Red()}
         textAlign="middle-center"
         uiTransform={{
           width: UI_ENCOUNTER_STAGE_LABEL_WIDTH,

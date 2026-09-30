@@ -15,7 +15,7 @@ import {
   UI_SKILL_ICON_WIDTH,
   UI_SKILL_LABEL_WIDTH,
   UI_SKILL_LEVEL_WIDTH,
-  UI_SKILL_PANEL_EMPTY_ROWS,
+  UI_SKILL_PANEL_HEIGHT,
   UI_SKILL_PANEL_PADDING_X,
   UI_SKILL_PANEL_PADDING_Y,
   UI_SKILL_PANEL_ROW_HEIGHT,
@@ -39,27 +39,6 @@ import { GreenPixelFrame } from './greenPixelFrame'
 
 const XP_BAR_TRACK = Color4.create(0.03, 0.04, 0.03, 1)
 const XP_BAR_FILL = Color4.Green()
-
-function EmptySkillRow(key: string) {
-  return (
-    <UiEntity
-      key={key}
-      uiTransform={{
-        width: '100%',
-        height: UI_SKILL_PANEL_ROW_HEIGHT,
-        margin: { bottom: UI_SKILL_PANEL_ROW_MARGIN }
-      }}
-    />
-  )
-}
-
-function emptySkillRows() {
-  const rows = []
-  for (let i = 0; i < UI_SKILL_PANEL_EMPTY_ROWS; i++) {
-    rows.push(EmptySkillRow(`empty-${i}`))
-  }
-  return rows
-}
 
 function localSkillLevels() {
   const me = getPlayer()
@@ -154,7 +133,7 @@ export function SkillLevelsHud() {
     <GreenPixelFrame
       uiTransform={{
         width: UI_SKILL_PANEL_WIDTH,
-        height: 'auto',
+        height: UI_SKILL_PANEL_HEIGHT,
         positionType: 'absolute',
         position: { top: UI_HUD_EDGE_PADDING_Y, right: UI_HUD_EDGE_PADDING_X },
         flexDirection: 'column'
@@ -163,6 +142,7 @@ export function SkillLevelsHud() {
         <UiEntity
           uiTransform={{
             width: '100%',
+            height: '100%',
             flexDirection: 'column',
             padding: {
               left: UI_SKILL_PANEL_PADDING_X,
@@ -186,7 +166,7 @@ export function SkillLevelsHud() {
           />
           {SkillRow(
             UI_GUNNER_ICON_PATH,
-            'Gunner',
+            'Weapons',
             stats.gunnerLevel,
             skillProgress(stats.gunnerLevel, stats.gunnerXp, 'gunner'),
             'gunner'
@@ -198,14 +178,19 @@ export function SkillLevelsHud() {
             skillProgress(stats.engineeringLevel, stats.engineeringXp, 'engineering'),
             'engineering'
           )}
-          {emptySkillRows()}
+          <UiEntity uiTransform={{ width: '100%', flexGrow: 1 }} />
           <Label
             value={boldUi(doubleXpLabel(stats))}
             font={UI_FONT}
             fontSize={UI_SKILL_DOUBLE_XP_FONT_SIZE}
             color={UI_TINT}
-            textAlign="bottom-center"
-            uiTransform={{ width: '100%', height: UI_SKILL_DOUBLE_XP_ROW_HEIGHT }}
+            textAlign="middle-center"
+            uiTransform={{
+              width: '100%',
+              height: UI_SKILL_DOUBLE_XP_ROW_HEIGHT,
+              // Temporary: nudge up about one text row
+              margin: { bottom: UI_SKILL_DOUBLE_XP_ROW_HEIGHT }
+            }}
           />
         </UiEntity>
       </GreenPixelFrame>

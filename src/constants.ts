@@ -137,7 +137,7 @@ export const SAUCER_APPROACH_SECONDS = 2
 /** Seconds between saucer shots. First shot waits one full interval after approach. */
 export const SAUCER_FIRE_INTERVAL = 2
 /** Seconds an asteroid exists before it hits the ship (unless shot). */
-export const ASTEROID_FLIGHT_TIME = 1//11
+export const ASTEROID_FLIGHT_TIME = 12
 /*
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   Terra: {
@@ -653,9 +653,9 @@ export const UI_SELECT_TARGET_LABEL_HEIGHT = '6vh'
 export const UI_SELECT_TARGET_BLINK_MS = 500
 
 // Hull bar
-export const UI_HEALTH_BAR_WIDTH = '30%'
-export const UI_HEALTH_BAR_HEIGHT = '4%'
-export const UI_HEALTH_BAR_FONT_SIZE = 18
+export const UI_HEALTH_BAR_WIDTH = '36%'
+export const UI_HEALTH_BAR_HEIGHT = '4.8%'
+export const UI_HEALTH_BAR_FONT_SIZE = 22
 
 // Repair hold, centered on the screen. Width shrinks from this size as the hold progresses.
 export const UI_REPAIR_HOLD_BAR_WIDTH = '24%'
@@ -667,15 +667,17 @@ export const UI_ENCOUNTER_STAGE_DURATION_SECONDS = 2
 export const UI_ENCOUNTER_STAGE_FONT_SIZE = 48
 export const UI_ENCOUNTER_STAGE_LABEL_WIDTH = '38%'
 export const UI_ENCOUNTER_STAGE_LABEL_HEIGHT = '7%'
+/** Top edge of the banner. Centers the 7% label on the line 66% up the screen (34% from the top). */
+export const UI_ENCOUNTER_STAGE_LABEL_TOP = '30.5%'
 
 // Overcharge label
 export const UI_OVERCHARGE_LABEL_WIDTH = '57%'
 export const UI_OVERCHARGE_LABEL_HEIGHT = '4.5%'
 export const UI_OVERCHARGE_LABEL_FONT_SIZE = 27
-export const UI_OVERCHARGE_LABEL_MARGIN_TOP = '11%'
+export const UI_OVERCHARGE_LABEL_MARGIN_TOP = '11.8%'
 
-// Skills panel
-export const UI_SKILL_PANEL_EMPTY_ROWS = 3
+// Skills panel (fixed height so footer text stays inside the frame, not viewport-bottom aligned)
+export const UI_SKILL_PANEL_HEIGHT = '47vh'
 export const UI_SKILL_PANEL_WIDTH = UI_BACK_TO_SHIP_BUTTON_WIDTH
 export const UI_SKILL_PANEL_ROW_HEIGHT = '5vh'
 export const UI_SKILL_PANEL_ROW_MARGIN = '2vh'
@@ -691,9 +693,22 @@ export const UI_SKILL_LEVEL_WIDTH = '16%'
 export const UI_SKILL_XP_BAR_HEIGHT = '16%'
 export const UI_SKILL_XP_BAR_MARGIN_TOP = '4%'
 export const UI_SKILL_DOUBLE_XP_ROW_HEIGHT = '3vh'
-export const UI_SKILL_DOUBLE_XP_FONT_SIZE = 20
+export const UI_SKILL_DOUBLE_XP_FONT_SIZE = 18
 export const UI_GUNNER_ICON_PATH = 'assets/scene/Images/gunner.png'
 export const UI_ENGINEERING_ICON_PATH = 'assets/scene/Images/engineering.png'
+
+// Off-screen breach repair icons, drawn on the screen edge toward each active breach
+export const UI_BREACH_ICON_SIZE_VH = 8.4
+/** Extra scale at the peak of the pulse (0.15 = up to 15% bigger). */
+export const UI_BREACH_ICON_PULSE_AMOUNT = 0.30
+/** Pulses (bounces) per second; |sin| makes each half-cycle a bounce. */
+export const UI_BREACH_ICON_PULSE_HZ = 1.5
+/** Icon center is kept this many half-icon-sizes from each screen edge (1 = touching, extra room covers the pulse). */
+export const UI_BREACH_ICON_EDGE_INSET_HALF_SIZES = 1.3
+export const UI_BREACH_ICON_TINT = Color4.create(1, 0.27, 0.05, 1)
+/** The rectangle around the player, "stood up" onto the screen, is 16:9 (half extents in arbitrary units). */
+export const UI_BREACH_RECT_HALF_WIDTH = 16
+export const UI_BREACH_RECT_HALF_HEIGHT = 9
 
 // Green pixel frame / buttons
 export const UI_GREEN_PIXEL_FRAME_PATH = 'assets/scene/Images/green_pixel_frame_9.png'

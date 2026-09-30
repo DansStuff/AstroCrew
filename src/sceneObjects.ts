@@ -119,6 +119,13 @@ function breachIdFromName(name: string): number | undefined {
   return id
 }
 
+const breachWorldPositions = new Map<number, Vector3>()
+
+/** Scene-space positions of each breach, cached at setup (breaches are static). */
+export function getBreachWorldPositions(): ReadonlyMap<number, Vector3> {
+  return breachWorldPositions
+}
+
 export function getKnownBreachIds(): number[] {
   return [...breachEntities.keys()]
 }
@@ -524,6 +531,7 @@ function BreachRepairSystem(dt: number): void {
 export function setupSceneObjects(): void {
   turretViews.clear()
   breachEntities.clear()
+  breachWorldPositions.clear()
   clearEntitySounds()
   overchargeStation = null
   missionTable = null
@@ -556,6 +564,7 @@ export function setupSceneObjects(): void {
         continue
       }
       breachEntities.set(breachId, entity)
+      breachWorldPositions.set(breachId, getWorldPosition(engine, entity))
       continue
     }
     if (isWeaponName(name.value)) {
