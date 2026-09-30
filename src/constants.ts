@@ -36,6 +36,13 @@ export type EncounterParams = {
 /** Starting hull hit points. The HUD bar is hullHp / this value. */
 export const SHIP_BASE_HULL_HP = 100
 
+/** Seconds the ship spins out after the hull reaches 0, before the mission resets. */
+export const SHIP_DEATH_SPIN_SECONDS = 5
+/** Spin rate the death spin approaches. */
+export const SHIP_DEATH_SPIN_MAX_DEGREES_PER_SECOND = 720
+/** Time constant of the spin ramp: ~63% of max speed after this many seconds. */
+export const SHIP_DEATH_SPIN_RAMP_SECONDS = 1.5
+
 /** Hull HP restored by a level 1 engineer when a breach is repaired. */
 export const ENGINEERING_REPAIR_BASE_HP = 5
 /** Extra hull HP restored per engineering level above 1. Level 2 = 6, level 10 = 14. */
@@ -115,7 +122,7 @@ export const SAUCER_APPROACH_SECONDS = 2
 /** Seconds between saucer shots. First shot waits one full interval after approach. */
 export const SAUCER_FIRE_INTERVAL = 2
 /** Seconds an asteroid exists before it hits the ship (unless shot). */
-export const ASTEROID_FLIGHT_TIME = 11
+export const ASTEROID_FLIGHT_TIME = 1//11
 /*
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   Terra: {
@@ -190,7 +197,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   Terra: {
     hpMultiplier: 1,
-    damageMultiplier: 0,
+    damageMultiplier: 1000,
     stages: [
 
       { kind: 'asteroid', turret: 'center', hazardCount: 1 },
@@ -545,6 +552,13 @@ export const CAMERA_SHAKE_HAZARD_IMPACT_INTENSITY = 1
 
 /** Shake intensity when a saucer shot hits the ship. */
 export const CAMERA_SHAKE_SAUCER_SHOT_INTENSITY = 0.6
+
+/** Random intensity range for each shake burst during the death spin. */
+export const CAMERA_SHAKE_DEATH_MIN_INTENSITY = 2
+export const CAMERA_SHAKE_DEATH_MAX_INTENSITY = 3
+/** Random gap in seconds between death-spin shake bursts. */
+export const CAMERA_SHAKE_DEATH_MIN_INTERVAL = 0.15
+export const CAMERA_SHAKE_DEATH_MAX_INTERVAL = 0.45
 
 export const SHIP_LASER_SOUND_PATH = 'assets/scene/Sounds/laser1.mp3'
 

@@ -263,7 +263,7 @@ function applyMissionLights(inEncounter: boolean): void {
 
 function LowHullSoundSystem(): void {
   const { missionStarted, hullHp } = getGameState()
-  const low = missionStarted && hullHp > 0 && hullHp < SHIP_BASE_HULL_HP * LOW_HP_THRESHOLD
+  const low = missionStarted && hullHp < SHIP_BASE_HULL_HP * LOW_HP_THRESHOLD
   setGlobalLoop(LOW_HP_SOUND_PATH, low)
 }
 

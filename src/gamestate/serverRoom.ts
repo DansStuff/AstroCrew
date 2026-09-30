@@ -61,6 +61,19 @@ export function notifyNewMission(): void {
   room.send('notifyNewMission', { resetAt: Date.now() })
 }
 
+export type ShipDyingNotify = {
+  axis: { x: number; y: number; z: number }
+  startedAt: number
+}
+
+export function notifyShipDying(data: ShipDyingNotify, to?: string): void {
+  if (to) {
+    room.send('notifyShipDying', data, { to: [to] })
+    return
+  }
+  room.send('notifyShipDying', data)
+}
+
 export function notifyShipDestroyed(): void {
   room.send('notifyShipDestroyed', { destroyedAt: Date.now() })
 }

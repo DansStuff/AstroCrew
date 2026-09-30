@@ -6,7 +6,13 @@
 import { engine } from '@dcl/sdk/ecs'
 import { isServer } from '@dcl/sdk/network'
 import { createWaveEncounter, type Encounter } from '../encounters/encounter'
-import { ENCOUNTER_PARAMS, engineeringRepairHp, PATH_START_STOP_ID, SKILL_XP_PER_REPAIR } from '../constants'
+import {
+  ENCOUNTER_PARAMS,
+  engineeringRepairHp,
+  PATH_START_STOP_ID,
+  SHIP_DEATH_SPIN_SECONDS,
+  SKILL_XP_PER_REPAIR
+} from '../constants'
 import { setPlayerTarget, configureHazardNotifies, resetLive } from '../hazards/simulation'
 import { isPathFinished, resetPathToStart, resumeFromStop, setOnStopReached } from '../path/follow'
 import { getWeeklyBoardSnapshot, recordWeeklyMission } from '../leaderboard/weeklyBoard'
@@ -44,22 +50,27 @@ import {
   notifyRoundResults,
   notifySaucerFired,
   notifyShipDestroyed,
+  notifyShipDying,
   notifyWeaponsOvercharged,
   notifyWeeklyBoard,
-  setupServerInbox
+  setupServerInbox,
+  type ShipDyingNotify
 } from './serverRoom'
 
-export type MissionState = 'idle' | 'traveling' | 'inEncounter' | 'missionComplete'
+export type MissionState = 'idle' | 'traveling' | 'inEncounter' | 'shipDying' | 'missionComplete'
 
 export type MissionEvent =
   | { type: 'MISSION_START' }
   | { type: 'STOP_REACHED'; stopId: string; pathFinished: boolean }
   | { type: 'ENCOUNTER_CLEARED'; pathFinished: boolean }
   | { type: 'SHIP_DESTROYED' }
+  | { type: 'DEATH_SEQUENCE_ENDED' }
   | { type: 'MISSION_RESET' }
 
 let currentState: MissionState = 'idle'
 let activeEncounter: Encounter | null = null
+let shipDying: ShipDyingNotify | null = null
+let shipDyingElapsed = 0
 
 function hasEncounterStages(stopId: string): boolean {
   const params = ENCOUNTER_PARAMS[stopId]
@@ -80,12 +91,23 @@ function nextState(state: MissionState, event: MissionEvent): MissionState | nul
       return null
     case 'inEncounter':
       if (event.type === 'ENCOUNTER_CLEARED') return event.pathFinished ? 'missionComplete' : 'traveling'
-      if (event.type === 'SHIP_DESTROYED') return 'idle'
+      if (event.type === 'SHIP_DESTROYED') return 'shipDying'
+      return null
+    case 'shipDying':
+      if (event.type === 'DEATH_SEQUENCE_ENDED') return 'idle'
       return null
     case 'missionComplete':
       if (event.type === 'MISSION_RESET') return 'idle'
       return null
   }
+}
+
+/** Uniformly distributed direction on the unit sphere. */
+function randomUnitAxis(): { x: number; y: number; z: number } {
+  const z = Math.random() * 2 - 1
+  const phi = Math.random() * Math.PI * 2
+  const r = Math.sqrt(1 - z * z)
+  return { x: r * Math.cos(phi), y: r * Math.sin(phi), z }
 }
 
 function disposeEncounter(): void {
@@ -177,6 +199,15 @@ function applyTransition(from: MissionState, to: MissionState, event: MissionEve
   }
 
   if (event.type === 'SHIP_DESTROYED') {
+    disposeEncounter()
+    shipDyingElapsed = 0
+    shipDying = { axis: randomUnitAxis(), startedAt: Date.now() }
+    notifyShipDying(shipDying)
+    return
+  }
+
+  if (event.type === 'DEATH_SEQUENCE_ENDED') {
+    shipDying = null
     finishRound(false)
     resetWorld()
     notifyShipDestroyed()
@@ -217,6 +248,13 @@ function EncounterTickSystem(dt: number): void {
     return
   }
   missionCompleteElapsed = 0
+  if (currentState === 'shipDying') {
+    shipDyingElapsed += dt
+    if (shipDyingElapsed >= SHIP_DEATH_SPIN_SECONDS) {
+      processEvent({ type: 'DEATH_SEQUENCE_ENDED' })
+    }
+    return
+  }
   if (!activeEncounter) return
 
   const result = activeEncounter.tick(dt)
@@ -236,6 +274,7 @@ function EncounterTickSystem(dt: number): void {
 
 export function setupStateMachine(): void {
   currentState = 'idle'
+  shipDying = null
   disposeEncounter()
 
   if (!isServer()) return
@@ -265,12 +304,16 @@ export function setupStateMachine(): void {
       if (currentState === 'inEncounter' && turret) {
         notifyEncounterStage(turret, from)
       }
+      if (currentState === 'shipDying' && shipDying) {
+        notifyShipDying(shipDying, from)
+      }
     },
     onHazardTarget: (from, hazardId) => {
       if (currentState !== 'inEncounter') return
       setPlayerTarget(from, hazardId)
     },
     onRepairBreach: (from, breachId) => {
+      if (currentState === 'shipDying') return
       const heal = engineeringRepairHp(getEngineeringLevel(from))
       if (repairBreach(breachId, heal)) {
         addRepair(from)
@@ -279,6 +322,7 @@ export function setupStateMachine(): void {
       }
     },
     onOvercharge: (from) => {
+      if (currentState === 'shipDying') return
       if (!activateOvercharge()) return
       notifyWeaponsOvercharged(from)
       console.log(`[SERVER] Weapons overcharged by ${from}`)

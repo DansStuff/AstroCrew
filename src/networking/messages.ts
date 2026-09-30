@@ -54,6 +54,10 @@ export const Messages = {
   notifyNewMission: Schemas.Map({
     resetAt: Schemas.Int64
   }),
+  notifyShipDying: Schemas.Map({
+    axis: Schemas.Vector3,
+    startedAt: Schemas.Int64
+  }),
   notifyShipDestroyed: Schemas.Map({
     destroyedAt: Schemas.Int64
   }),
