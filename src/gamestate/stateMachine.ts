@@ -203,7 +203,20 @@ export function processEvent(event: MissionEvent): boolean {
   return true
 }
 
+/** Seconds to wait on the mission-complete screen before resetting automatically (nobody pressed restart). */
+const AUTO_RESET_DELAY_SECONDS = 1
+let missionCompleteElapsed = 0
+
 function EncounterTickSystem(dt: number): void {
+  if (currentState === 'missionComplete') {
+    missionCompleteElapsed += dt
+    if (missionCompleteElapsed >= AUTO_RESET_DELAY_SECONDS) {
+      console.log('[SERVER] Auto-resetting mission after timeout')
+      processEvent({ type: 'MISSION_RESET' })
+    }
+    return
+  }
+  missionCompleteElapsed = 0
   if (!activeEncounter) return
 
   const result = activeEncounter.tick(dt)
@@ -242,11 +255,6 @@ export function setupStateMachine(): void {
     onMissionStart: (from) => {
       if (processEvent({ type: 'MISSION_START' })) {
         console.log(`[SERVER] Mission started (${PATH_START_STOP_ID}) by ${from}`)
-      }
-    },
-    onNewMission: (from) => {
-      if (processEvent({ type: 'MISSION_RESET' })) {
-        console.log(`[SERVER] Mission reset by ${from}`)
       }
     },
     onInitialState: (from) => {

@@ -90,7 +90,7 @@ function encounterStageLabel(): string {
   return 'INCOMING'
 }
 
-function showRestart(): boolean {
+function missionEnded(): boolean {
   const state = getGameState()
   return state.missionStarted && !state.inEncounter && state.encounterId === lastStopId()
 }
@@ -112,11 +112,6 @@ function requestMissionStart() {
   room.send('requestMissionStart', { requestedAt: Date.now() })
 }
 
-function requestNewMission() {
-  if (!showRestart() || !isStateSyncronized()) return
-  room.send('requestNewMission', { requestedAt: Date.now() })
-}
-
 function requestLeaveTurret() {
   exitWeaponCamera()
 }
@@ -136,7 +131,7 @@ function selectTargetBlinkOn(): boolean {
 }
 
 function inMissionHud() {
-  return getGameState().missionStarted && !showRestart()
+  return getGameState().missionStarted && !missionEnded()
 }
 
 

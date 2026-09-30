@@ -109,7 +109,7 @@ function createHazardVisuals(kind: HazardKind): HazardVisuals {
       ]
     })
   } else {
-    Tumble.create(entity)
+    Tumble.create(entity, {})
   }
   VisibilityComponent.create(entity, { visible: false })
 

@@ -1,30 +1,32 @@
 week 5-6
 
-need to test multiplayer shooting
-
-replace planet models -doneish
 
 
 
 
+1. -animate miniship (just cus) - Done
 
-ship explosion - importantwa
-
-
-
-game balance pass
-
-
-
-sounds: weapon powerup ***
+2. sounds: 
+        weapon powerup ***
         low hp claxons
+        repair
+
+3. need to test multiplayer shooting
+
+4. replace planet models -doneish
+add planet names
 
 
--player animations
--animate miniship
+
+
+
+
 
 onboarding (maybe just add a splash screen) (need final models for consoles)
 
-make sure damage penalty per player is capped at sensible number
+game balance pass
+        make sure damage penalty per player is capped at sensible number
 
-add planet names
+-ship explosion
+-player animations
+-hazard damage and death animations

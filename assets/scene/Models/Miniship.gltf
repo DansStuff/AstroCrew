@@ -46,7 +46,7 @@
 					0.00035462965024635196,
 					0.8002511262893677,
 					0,
-					0.17605635523796082
+					0.2957746684551239
 				],
 				"metallicFactor":0
 			}
@@ -72,14 +72,14 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":104,
+			"count":144,
 			"max":[
-				2.241832733154297,
+				2.179722547531128,
 				0.8550251126289368,
 				1.750061273574829
 			],
 			"min":[
-				-2.241832733154297,
+				-2.179722547531128,
 				-0.0016586929559707642,
 				-1.9223606586456299
 			],
@@ -88,51 +88,51 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":104,
+			"count":144,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":104,
+			"count":144,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":192,
+			"count":348,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":1248,
+			"byteLength":1728,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":1248,
-			"byteOffset":1248,
+			"byteLength":1728,
+			"byteOffset":1728,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":832,
-			"byteOffset":2496,
+			"byteLength":1152,
+			"byteOffset":3456,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":384,
-			"byteOffset":3328,
+			"byteLength":696,
+			"byteOffset":4608,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":3712,
+			"byteLength":5304,
 			"uri":"Miniship.bin"
 		}
 	]

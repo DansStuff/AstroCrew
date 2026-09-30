@@ -12,6 +12,7 @@ import { isServer } from '@dcl/sdk/network'
 import {
   PLANET_CULL_BEHIND_HALF_ANGLE_DEGREES,
   PLANET_ENCLOSING_SPHERE_RADIUS,
+  PLANET_SPIN_DEGREES_PER_SECOND,
   STAR_BASE_COLOR,
   STAR_MODEL_PATH,
   STAR_SPAWN_COUNT_DEFAULT,
@@ -22,7 +23,7 @@ import { SHIP_ROUTE } from '../path/route'
 import { shipVirtualPosition, shipVirtualRotation } from '../ship'
 import { directionFromTo, rotateByInverse } from '../utilities'
 import { ProjectedBody, ProjectedBodySystem } from './projection'
-import { TumbleSystem } from './tumble'
+import { Tumble, TumbleSystem } from './tumble'
 
 export const PlanetData = engine.defineComponent('PlanetData', {
   name: Schemas.String
@@ -43,7 +44,8 @@ export type PlanetSpawnData = {
 export function createPlanet(
   modelPath: string,
   data: PlanetSpawnData,
-  cullable: boolean = true
+  cullable: boolean = true,
+  spin: boolean = true
 ): Entity {
   const entity = engine.addEntity()
 
@@ -60,6 +62,13 @@ export function createPlanet(
     shellRadius: PLANET_ENCLOSING_SPHERE_RADIUS
   })
   PlanetData.create(entity, { name: data.name })
+  // Very slow spin, as if huge and distant.
+  if (spin) {
+    Tumble.create(entity, {
+      axis: Vector3.Up(),
+      degreesPerSecond: PLANET_SPIN_DEGREES_PER_SECOND
+    })
+  }
   if (cullable) {
     Cullable.create(entity)
     VisibilityComponent.create(entity, { visible: true })
@@ -125,7 +134,8 @@ export function spawnDistantStars(count: number = STAR_SPAWN_COUNT_DEFAULT): voi
         position,
         radius
       },
-      true
+      true,
+      false
     )
 
     // Slight per-star orange tint (0.15–0.45), stable across reloads.

@@ -38,3 +38,20 @@ export function playGlobalSound(path: string): void {
     currentTime: 0
   })
 }
+
+const loopingState = new Map<string, boolean>()
+
+/** Start/stop a looping global sound. Only touches the component when the state changes. */
+export function setGlobalLoop(path: string, playing: boolean): void {
+  if ((loopingState.get(path) ?? false) === playing) return
+  loopingState.set(path, playing)
+  const entity = entityFor(path)
+  AudioSource.createOrReplace(entity, {
+    audioClipUrl: path,
+    playing,
+    loop: true,
+    volume: 1,
+    global: true,
+    currentTime: 0
+  })
+}

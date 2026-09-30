@@ -16,9 +16,6 @@ export const Messages = {
   requestHazardTarget: Schemas.Map({
     hazardId: Schemas.Int
   }),
-  requestNewMission: Schemas.Map({
-    requestedAt: Schemas.Int64
-  }),
   requestRepairBreach: Schemas.Map({
     breachId: Schemas.Int
   }),

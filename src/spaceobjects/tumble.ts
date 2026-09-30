@@ -1,9 +1,16 @@
-import { engine, Entity, Transform, VisibilityComponent } from '@dcl/sdk/ecs'
+import { engine, Entity, Schemas, Transform, VisibilityComponent } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { HAZARD_SPIN_DEGREES_PER_SECOND } from '../constants'
 
-/** Tag: apply local tumble on top of ProjectedBody celestial orientation. */
-export const Tumble = engine.defineComponent('Tumble', {})
+/**
+ * Apply local rotation on top of ProjectedBody celestial orientation.
+ * With no fields set: random axis at HAZARD_SPIN_DEGREES_PER_SECOND (asteroids).
+ * `axis` / `degreesPerSecond` override those (e.g. slow planet spin).
+ */
+export const Tumble = engine.defineComponent('Tumble', {
+  axis: Schemas.Optional(Schemas.Vector3),
+  degreesPerSecond: Schemas.Optional(Schemas.Float)
+})
 
 type TumbleState = { axis: Vector3; angle: number }
 const tumbleState = new Map<Entity, TumbleState>()
@@ -17,15 +24,15 @@ function randomUnitAxis(): Vector3 {
 
 /** Must run after ProjectedBodySystem, which overwrites Transform.rotation. */
 export function TumbleSystem(dt: number) {
-  for (const [entity] of engine.getEntitiesWith(Tumble, Transform)) {
+  for (const [entity, tumbleConfig] of engine.getEntitiesWith(Tumble, Transform)) {
     if (VisibilityComponent.has(entity) && !VisibilityComponent.get(entity).visible) continue
 
     let spin = tumbleState.get(entity)
     if (!spin) {
-      spin = { axis: randomUnitAxis(), angle: 0 }
+      spin = { axis: tumbleConfig.axis ?? randomUnitAxis(), angle: 0 }
       tumbleState.set(entity, spin)
     }
-    spin.angle += dt * HAZARD_SPIN_DEGREES_PER_SECOND
+    spin.angle += dt * (tumbleConfig.degreesPerSecond ?? HAZARD_SPIN_DEGREES_PER_SECOND)
     const tumble = Quaternion.fromAngleAxis(spin.angle, spin.axis)
     const transform = Transform.getMutable(entity)
     transform.rotation = Quaternion.multiply(transform.rotation, tumble)

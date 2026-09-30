@@ -35,7 +35,11 @@ import {
   WEAPON_MUZZLE_LOCAL_OFFSET,
   type TurretId
 } from './constants'
+import { addEntitySound, clearEntitySounds, playEntitySound } from './audio/entitySounds'
+import { BREACH_REPAIR_SOUND_PATH, LOW_HP_SOUND_PATH, LOW_HP_THRESHOLD, SHIP_BASE_HULL_HP, MINISHIP_POSES, OVERCHARGE_END_SOUND_PATH, OVERCHARGE_START_SOUND_PATH, PATH_START_STOP_ID } from './constants'
+import { playGlobalSound, setGlobalLoop } from './audio/global'
 import { getGameState, isBreachActive } from './gamestate'
+import { currentStopId } from './path/follow'
 import { room } from './networking/messages'
 import { Spinner, SpinSystem } from './spinner'
 
@@ -57,6 +61,8 @@ let missionLights: Entity | null = null
 let missionLightsShowingEncounter: boolean | null = null
 let weaponLights: Entity | null = null
 let weaponLightsShowingOvercharge: boolean | null = null
+let miniship: Entity | null = null
+let minishipPoseIndex = -1
 let breachPointerEventsReady = false
 
 const LIGHT_EMISSIVE_INTENSITY = 3
@@ -151,6 +157,8 @@ function setBreachInteractable(entity: Entity, interactable: boolean): void {
 }
 
 function initBreach(entity: Entity): void {
+  addEntitySound(entity, 'repair', BREACH_REPAIR_SOUND_PATH)
+  // Add more here, e.g. addEntitySound(entity, 'appear', BREACH_APPEAR_SOUND_PATH)
   VisibilityComponent.createOrReplace(entity, { visible: false, propagateToChildren: true })
   setBreachPointerCollider(entity, false)
 }
@@ -249,18 +257,51 @@ function applyMissionLights(inEncounter: boolean): void {
   applyEmissiveMaterial(missionLights, inEncounter ? Color3.Red() : Color3.Green())
 }
 
+function LowHullSoundSystem(): void {
+  const { missionStarted, hullHp } = getGameState()
+  const low = missionStarted && hullHp > 0 && hullHp < SHIP_BASE_HULL_HP * LOW_HP_THRESHOLD
+  setGlobalLoop(LOW_HP_SOUND_PATH, low)
+}
+
 function MissionLightsSystem(): void {
   applyMissionLights(getGameState().inEncounter)
 }
 
 function applyWeaponLights(overcharged: boolean): void {
   if (!weaponLights || weaponLightsShowingOvercharge === overcharged) return
+  // null = first application; don't play a sound for the initial state
+  if (weaponLightsShowingOvercharge !== null) {
+    playGlobalSound(overcharged ? OVERCHARGE_START_SOUND_PATH : OVERCHARGE_END_SOUND_PATH)
+  }
   weaponLightsShowingOvercharge = overcharged
   applyEmissiveMaterial(weaponLights, overcharged ? WEAPON_LIGHT_OVERCHARGE_COLOR : WEAPON_LIGHT_COLOR)
 }
 
 function WeaponLightsSystem(): void {
   applyWeaponLights(getGameState().weaponsOvercharged)
+}
+
+/** 'start' -> 0, 'encounter-N' -> N. Returns null for unknown ids. */
+function minishipPoseIndexForStop(stopId: string): number | null {
+  if (stopId === PATH_START_STOP_ID) return 0
+  const match = /^encounter-(\d+)$/.exec(stopId)
+  if (!match) return null
+  const index = Number(match[1])
+  return index < MINISHIP_POSES.length ? index : null
+}
+
+/** Poses the Miniship for the stop the ship is holding at; keeps the last pose while transiting. */
+function MinishipSystem(): void {
+  if (!miniship) return
+  const stopId = currentStopId()
+  if (!stopId) return
+  const index = minishipPoseIndexForStop(stopId)
+  if (index === null || index === minishipPoseIndex) return
+  minishipPoseIndex = index
+  const pose = MINISHIP_POSES[index]
+  const transform = Transform.getMutable(miniship)
+  transform.position = Vector3.clone(pose.position)
+  transform.rotation = Quaternion.fromEulerDegrees(0, pose.yawDegrees, 0)
 }
 
 function setEntityVisible(entity: Entity | null, visible: boolean): void {
@@ -375,6 +416,8 @@ function BreachVisibilitySystem(): void {
     const current = VisibilityComponent.getOrNull(entity)
     const visibilityChanged = !current || current.visible !== visible
     if (visibilityChanged) {
+      // Active -> inactive after init means the breach was repaired
+      if (current?.visible === true && !visible) playEntitySound(entity, 'repair')
       VisibilityComponent.createOrReplace(entity, { visible, propagateToChildren: true })
     }
     if (platformReady && (visibilityChanged || attachPointerEventsNow)) {
@@ -399,6 +442,7 @@ function BreachRepairSystem(): void {
 export function setupSceneObjects(): void {
   turretViews.clear()
   breachEntities.clear()
+  clearEntitySounds()
   overchargeStation = null
   missionTable = null
   missionTableText = null
@@ -407,6 +451,8 @@ export function setupSceneObjects(): void {
   missionLightsShowingEncounter = null
   weaponLights = null
   weaponLightsShowingOvercharge = null
+  miniship = null
+  minishipPoseIndex = -1
   consoleCameras.clear()
   consoleTurrets.clear()
   consoleTutArrows.clear()
@@ -456,6 +502,10 @@ export function setupSceneObjects(): void {
     }
     if (name.value === EntityNames.MissionLights) {
       missionLights = entity
+      continue
+    }
+    if (name.value === EntityNames.Miniship_gltf) {
+      miniship = entity
       continue
     }
     if (name.value === EntityNames.WeaponLights) {
@@ -533,6 +583,8 @@ export function setupSceneObjects(): void {
   engine.addSystem(OverchargeStationSystem)
   engine.addSystem(MissionTableSystem)
   engine.addSystem(MissionLightsSystem)
+  engine.addSystem(LowHullSoundSystem)
   engine.addSystem(WeaponLightsSystem)
+  engine.addSystem(MinishipSystem)
   engine.addSystem(SpinSystem)
 }

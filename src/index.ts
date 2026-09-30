@@ -6,7 +6,7 @@
 import { AssetLoad, engine } from '@dcl/sdk/ecs'
 import { isServer } from '@dcl/sdk/network'
 import { registerGlobalSounds } from './audio/global'
-import { ENCOUNTER_STAGE_SOUND_PATH, HAZARD_HIT_SHIP_SOUND_PATH, HAZARD_SELECT_SOUND_PATH, PATH_START_STOP_ID, SHIP_LASER_SOUND_PATH } from './constants'
+import { ENCOUNTER_STAGE_SOUND_PATH, HAZARD_HIT_SHIP_SOUND_PATH, HAZARD_SELECT_SOUND_PATH, LOW_HP_SOUND_PATH, OVERCHARGE_END_SOUND_PATH, OVERCHARGE_START_SOUND_PATH, PATH_START_STOP_ID, SHIP_LASER_SOUND_PATH } from './constants'
 import { CameraShakeSystem } from './effects/cameraShake'
 import { setupEncounters } from './encounters/client'
 import { setupScoreboard } from './leaderboard/scoreboard'
@@ -100,7 +100,7 @@ export function main() {
   setupUi()
   setupScoreboard()
   setupDebugTeleportToShip()
-  registerGlobalSounds([HAZARD_SELECT_SOUND_PATH, HAZARD_HIT_SHIP_SOUND_PATH, ENCOUNTER_STAGE_SOUND_PATH])
+  registerGlobalSounds([HAZARD_SELECT_SOUND_PATH, HAZARD_HIT_SHIP_SOUND_PATH, ENCOUNTER_STAGE_SOUND_PATH, OVERCHARGE_START_SOUND_PATH, OVERCHARGE_END_SOUND_PATH, LOW_HP_SOUND_PATH])
   AssetLoad.create(engine.RootEntity, {
     assets: [SHIP_LASER_SOUND_PATH, HAZARD_SELECT_SOUND_PATH, HAZARD_HIT_SHIP_SOUND_PATH, ENCOUNTER_STAGE_SOUND_PATH]
   })

@@ -47,7 +47,6 @@ export type WeeklyBoardNotify = {
 
 export type ServerInboxHandlers = {
   onMissionStart: (playerAddress: string) => void
-  onNewMission: (playerAddress: string) => void
   onInitialState: (playerAddress: string) => void
   onHazardTarget: (playerAddress: string, hazardId: number) => void
   onRepairBreach: (playerAddress: string, breachId: number) => void
@@ -119,11 +118,6 @@ export function setupServerInbox(handlers: ServerInboxHandlers): void {
   room.onMessage('requestMissionStart', (_data, context) => {
     if (!context) return
     handlers.onMissionStart(context.from)
-  })
-
-  room.onMessage('requestNewMission', (_data, context) => {
-    if (!context) return
-    handlers.onNewMission(context.from)
   })
 
   room.onMessage('requestInitialState', (_data, context) => {

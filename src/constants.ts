@@ -115,7 +115,7 @@ export const SAUCER_APPROACH_SECONDS = 2
 /** Seconds between saucer shots. First shot waits one full interval after approach. */
 export const SAUCER_FIRE_INTERVAL = 2
 /** Seconds an asteroid exists before it hits the ship (unless shot). */
-export const ASTEROID_FLIGHT_TIME = 11
+export const ASTEROID_FLIGHT_TIME = 1//11
 
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   'encounter-1': {
@@ -186,6 +186,62 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   }
 }
 
+/*
+export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
+  'encounter-1': {
+    hpMultiplier: 1,
+    damageMultiplier: 0,
+    stages: [
+
+      { kind: 'asteroid', turret: 'center', hazardCount: 1 },
+      
+    ]
+  },
+  'encounter-2': {
+    hpMultiplier: 1.33,
+    damageMultiplier: 0,
+    stages: [
+      { kind: 'asteroid', turret: 'center', hazardCount: 1 },
+    ]
+  },
+  'encounter-3': {
+    hpMultiplier: 1.67,
+    damageMultiplier: 0,
+    stages: [
+      { kind: 'asteroid', turret: 'center', hazardCount: 1 },
+    ]
+  },
+  'encounter-4': {
+    hpMultiplier: 2,
+    damageMultiplier: 0,
+    stages: [
+      { kind: 'asteroid', turret: 'center', hazardCount: 1 },
+    ]
+  },
+  'encounter-5': {
+    hpMultiplier: 2.33,
+    damageMultiplier: 0,
+    stages: [
+      { kind: 'asteroid', turret: 'center', hazardCount: 1 },
+    ]
+  },
+  'encounter-6': {
+    hpMultiplier: 2.67,
+    damageMultiplier: 0,
+    stages: [
+      { kind: 'asteroid', turret: 'center', hazardCount: 1 },
+    ]
+  },
+  'encounter-7': {
+    hpMultiplier: 8,
+    damageMultiplier: 0,
+    stages: [
+      { kind: 'asteroid', turret: 'center', hazardCount: 1 },
+    ]
+  }
+}
+*/
+
 // MARK: Ship
 
 /** Fixed scene-space anchor for the visible ship model (center of the enclosing sphere). */
@@ -219,6 +275,30 @@ export const SHIP_ROLL_SMOOTH = 2
 
 /** Extra yaw so virtual forward matches a Y flip of the ship GLTF. Applied after bank. */
 export const SHIP_MODEL_YAW_DEGREES = 180
+
+// MARK: Miniship
+
+export type MinishipPose = {
+  /** Scene-space position of the Miniship entity. */
+  position: Vector3
+  /** Rotation about Y, in degrees. */
+  yawDegrees: number
+}
+
+/**
+ * Miniship poses, 8 entries. Index 0 is the starting pose before a mission begins
+ * (matches the Miniship in the scene composite). The remaining entries are to be filled in.
+ */
+export const MINISHIP_POSES: MinishipPose[] = [
+  { position: Vector3.create(65.07147979736328, 61.75, 64.27969360351562), yawDegrees: -30 },
+  { position: Vector3.create(65.39566802978516, 61.75, 63.69566345214844), yawDegrees: 0 },
+  { position: Vector3.create(65.2730712890625, 61.75, 63.218544006347656), yawDegrees: 49.79 },
+  { position: Vector3.create(64.44740295410156, 61.75, 62.76624298095703), yawDegrees: 120 },
+  { position: Vector3.create(63.83460998535156, 61.75, 63.58098602294922), yawDegrees: 90 },
+  { position: Vector3.create(62.75, 61.75, 63.75), yawDegrees: 198.89 },
+  { position: Vector3.create(62.89591979980469, 61.75, 64.60245513916016), yawDegrees: 225 },
+  { position: Vector3.create(64.04685974121094, 61.75, 65.13430786132812), yawDegrees: 259.93 }
+]
 
 // MARK: Path
 
@@ -259,6 +339,8 @@ export const PATH_CATMULL_ROM_KNOT_EPSILON = 1e-4
  * Smaller values pull bodies onto a closer shell; apparent angular size is unchanged.
  */
 export const PLANET_ENCLOSING_SPHERE_RADIUS = 40 // previously 64
+/** Slow axial spin for planets, as if very large and distant. */
+export const PLANET_SPIN_DEGREES_PER_SECOND = 2
 
 /**
  * Smaller enclosing sphere for asteroids (closer shell than planets/stars).
@@ -453,6 +535,11 @@ export const SHIP_LASER_EMISSIVE_INTENSITY = 4
 // MARK: Encounters
 
 export const ENCOUNTER_STAGE_SOUND_PATH = 'assets/scene/Sounds/fail1.mp3'
+export const OVERCHARGE_START_SOUND_PATH = 'assets/scene/Sounds/powerup.mp3'
+export const OVERCHARGE_END_SOUND_PATH = 'assets/scene/Sounds/powerdown.mp3'
+export const BREACH_REPAIR_SOUND_PATH = 'assets/scene/Sounds/wrench.mp3'
+export const LOW_HP_SOUND_PATH = 'assets/scene/Sounds/low_hp.ogg'
+export const LOW_HP_THRESHOLD = 0.25
 
 // MARK: UI
 
@@ -518,9 +605,9 @@ export const UI_ENCOUNTER_STAGE_LABEL_WIDTH = '38%'
 export const UI_ENCOUNTER_STAGE_LABEL_HEIGHT = '7%'
 
 // Overcharge label
-export const UI_OVERCHARGE_LABEL_WIDTH = '38%'
-export const UI_OVERCHARGE_LABEL_HEIGHT = '3%'
-export const UI_OVERCHARGE_LABEL_FONT_SIZE = 18
+export const UI_OVERCHARGE_LABEL_WIDTH = '57%'
+export const UI_OVERCHARGE_LABEL_HEIGHT = '4.5%'
+export const UI_OVERCHARGE_LABEL_FONT_SIZE = 27
 export const UI_OVERCHARGE_LABEL_MARGIN_TOP = '11%'
 
 // Skills panel

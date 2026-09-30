@@ -84,7 +84,7 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":13393,
+			"count":6577,
 			"max":[
 				3.2804572582244873,
 				-0.00021700584329664707,
@@ -100,51 +100,51 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":13393,
+			"count":6577,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":13393,
+			"count":6577,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":51840,
+			"count":13824,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":160716,
+			"byteLength":78924,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":160716,
-			"byteOffset":160716,
+			"byteLength":78924,
+			"byteOffset":78924,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":107144,
-			"byteOffset":321432,
+			"byteLength":52616,
+			"byteOffset":157848,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":103680,
-			"byteOffset":428576,
+			"byteLength":27648,
+			"byteOffset":210464,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":532256,
+			"byteLength":238112,
 			"uri":"MissionTableText.bin"
 		}
 	]
