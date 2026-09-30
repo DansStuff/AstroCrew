@@ -116,9 +116,9 @@ export const SAUCER_APPROACH_SECONDS = 2
 export const SAUCER_FIRE_INTERVAL = 2
 /** Seconds an asteroid exists before it hits the ship (unless shot). */
 export const ASTEROID_FLIGHT_TIME = 11
-
+/*
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
-  'encounter-1': {
+  Terra: {
     hpMultiplier: 1,
     damageMultiplier: 1,
     stages: [
@@ -128,7 +128,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
       { kind: 'asteroid', turret: 'right', hazardCount: 2 }
     ]
   },
-  'encounter-2': {
+  Vaelith: {
     hpMultiplier: 1.33,
     damageMultiplier: 1.17,
     stages: [
@@ -137,7 +137,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
       { kind: 'saucer', turret: 'left' }
     ]
   },
-  'encounter-3': {
+  Korund: {
     hpMultiplier: 1.67,
     damageMultiplier: 1.33,
     stages: [
@@ -146,7 +146,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
       { kind: 'saucer', turret: 'right' },
     ]
   },
-  'encounter-4': {
+  Sablemere: {
     hpMultiplier: 2,
     damageMultiplier: 1.5,
     stages: [
@@ -155,7 +155,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
       { kind: 'asteroid', turret: 'right', hazardCount: 4 }
     ]
   },
-  'encounter-5': {
+  Orpheon: {
     hpMultiplier: 2.33,
     damageMultiplier: 1.67,
     stages: [
@@ -165,7 +165,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
       { kind: 'asteroid', turret: 'center', hazardCount: 6 },
     ]
   },
-  'encounter-6': {
+  Caelum: {
     hpMultiplier: 2.67,
     damageMultiplier: 1.83,
     stages: [
@@ -177,7 +177,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
       { kind: 'asteroid', turret: 'center', hazardCount: 6 }
     ]
   },
-  'encounter-7': {
+  Drenovar: {
     hpMultiplier: 8,
     damageMultiplier: 2,
     stages: [
@@ -185,10 +185,10 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
     ]
   }
 }
+*/
 
-/*
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
-  'encounter-1': {
+  Terra: {
     hpMultiplier: 1,
     damageMultiplier: 0,
     stages: [
@@ -197,42 +197,42 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
       
     ]
   },
-  'encounter-2': {
+  Vaelith: {
     hpMultiplier: 1.33,
     damageMultiplier: 0,
     stages: [
       { kind: 'asteroid', turret: 'center', hazardCount: 1 },
     ]
   },
-  'encounter-3': {
+  Korund: {
     hpMultiplier: 1.67,
     damageMultiplier: 0,
     stages: [
       { kind: 'asteroid', turret: 'center', hazardCount: 1 },
     ]
   },
-  'encounter-4': {
+  Sablemere: {
     hpMultiplier: 2,
     damageMultiplier: 0,
     stages: [
       { kind: 'asteroid', turret: 'center', hazardCount: 1 },
     ]
   },
-  'encounter-5': {
+  Orpheon: {
     hpMultiplier: 2.33,
     damageMultiplier: 0,
     stages: [
       { kind: 'asteroid', turret: 'center', hazardCount: 1 },
     ]
   },
-  'encounter-6': {
+  Caelum: {
     hpMultiplier: 2.67,
     damageMultiplier: 0,
     stages: [
       { kind: 'asteroid', turret: 'center', hazardCount: 1 },
     ]
   },
-  'encounter-7': {
+  Drenovar: {
     hpMultiplier: 8,
     damageMultiplier: 0,
     stages: [
@@ -240,7 +240,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
     ]
   }
 }
-*/
+
 
 // MARK: Ship
 
@@ -472,6 +472,28 @@ export const SAUCER_BEAM_WIDTH_PULSE_AMPLITUDE = 0.4
 /** Seconds for one full width pulse cycle. */
 export const SAUCER_BEAM_WIDTH_PULSE_PERIOD = 0.225
 
+/** Meters above the player's feet. The tutorial beam starts here. */
+export const TUTORIAL_BEAM_WAIST_HEIGHT = 0.5
+
+/** Meters below a tutorial arrow. The beam ends on the object the arrow indicates. */
+export const TUTORIAL_BEAM_TARGET_DROP = 1.25
+
+/** Scene-space width of the tutorial beam plane. */
+export const TUTORIAL_BEAM_WIDTH = 0.45
+
+export const TUTORIAL_BEAM_TEXTURE_PATH = 'assets/scene/Images/tut_beam.png'
+
+/**
+ * Repeats of tut_beam along the beam. The plane's UVs stay 0–1, so this is set once:
+ * the chevron count does not change as the beam stretches.
+ * Local X (width) is one copy; local Y (length) is this many.
+ */
+export const TUTORIAL_BEAM_TEXTURE_REPEATS = 15
+
+export const TUTORIAL_BEAM_EMISSIVE_COLOR = Color3.create(1, 1, 0)
+
+export const TUTORIAL_BEAM_EMISSIVE_INTENSITY = 1
+
 // MARK: Ship Weapons
 
 /** How long a laser plane stays visible after each shot. */
@@ -544,7 +566,7 @@ export const ENCOUNTER_STAGE_SOUND_PATH = 'assets/scene/Sounds/fail1.mp3'
 export const OVERCHARGE_START_SOUND_PATH = 'assets/scene/Sounds/powerup.mp3'
 export const OVERCHARGE_END_SOUND_PATH = 'assets/scene/Sounds/powerdown.mp3'
 export const BREACH_REPAIR_SOUND_PATH = 'assets/scene/Sounds/wrench.mp3'
-export const LOW_HP_SOUND_PATH = 'assets/scene/Sounds/low_hp.ogg'
+export const LOW_HP_SOUND_PATH = 'assets/scene/Sounds/low_hp2.mp3'
 export const LOW_HP_THRESHOLD = 0.25
 
 // MARK: UI

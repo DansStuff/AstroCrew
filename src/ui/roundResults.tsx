@@ -1,7 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { GreenPixelButton } from './greenPixelFrame'
-import { UI_FONT, UI_TINT, boldUi } from '../constants'
+import { PATH_START_STOP_ID, UI_FONT, UI_TINT, boldUi } from '../constants'
 import { room } from '../networking/messages'
 import { contributionMapFromRows, type RoundContribution } from '../players/contributions'
 
@@ -29,7 +29,14 @@ const PANEL_COLOR = Color4.create(0.1, 0.12, 0.16, 0.96)
 
 let visible = false
 let won = false
+let furthestEncounter = ''
 let rows: ResultRow[] = []
+
+function roundTitle(): string {
+  if (won) return 'MISSION COMPLETE'
+  if (!furthestEncounter || furthestEncounter === PATH_START_STOP_ID) return 'SHIP DESTROYED'
+  return `SHIP DESTROYED AT ${furthestEncounter.toUpperCase()}`
+}
 
 function truncateWallet(address: string): string {
   if (address.length <= 10) return address
@@ -38,9 +45,11 @@ function truncateWallet(address: string): string {
 
 export function showRoundResults(
   contributions: ReadonlyMap<string, RoundContribution>,
-  didWin: boolean
+  didWin: boolean,
+  reachedEncounter: string
 ): void {
   won = didWin
+  furthestEncounter = reachedEncounter
   rows = [...contributions.entries()]
     .map(([playerId, stats]) => ({
       playerId,
@@ -152,7 +161,7 @@ export function RoundResultsUi() {
         uiBackground={{ color: PANEL_COLOR }}
       >
         <Label
-          value={boldUi(won ? 'MISSION COMPLETE' : 'SHIP DESTROYED')}
+          value={boldUi(roundTitle())}
           font={UI_FONT}
           fontSize={32}
           color={UI_TINT}
@@ -232,6 +241,6 @@ export function setupRoundResultsUi() {
   room.onMessage('notifyRoundResults', (data) => {
     if (data.endedAt <= appliedResultsAt) return
     appliedResultsAt = data.endedAt
-    showRoundResults(contributionMapFromRows(data.contributions), data.won)
+    showRoundResults(contributionMapFromRows(data.contributions), data.won, data.furthestEncounter)
   })
 }

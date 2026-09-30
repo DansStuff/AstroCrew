@@ -27,6 +27,7 @@ export enum EntityNames {
   RightConsoleArrow = "RightConsoleArrow",
   RightWeapon = "RightWeapon",
   RightWeaponConsole = "RightWeaponConsole",
+  Sablemere_gltf = "Sablemere.gltf",
   Scoreboard = "Scoreboard",
   Ship = "Ship",
   WeaponLights = "WeaponLights",

@@ -33,6 +33,7 @@ import {
   WEAPON_LIGHT_COLOR,
   WEAPON_LIGHT_OVERCHARGE_COLOR,
   WEAPON_MUZZLE_LOCAL_OFFSET,
+  TUTORIAL_BEAM_TARGET_DROP,
   type TurretId
 } from './constants'
 import { addEntitySound, clearEntitySounds, playEntitySound } from './audio/entitySounds'
@@ -40,7 +41,9 @@ import { BREACH_REPAIR_SOUND_PATH, LOW_HP_SOUND_PATH, LOW_HP_THRESHOLD, SHIP_BAS
 import { playGlobalSound, setGlobalLoop } from './audio/global'
 import { getGameState, isBreachActive } from './gamestate'
 import { currentStopId } from './path/follow'
+import { SHIP_ROUTE } from './path/routedata'
 import { room } from './networking/messages'
+import { setTutorialBeamTarget, setupTutorialBeam } from './effects/tutorialBeam'
 import { Spinner, SpinSystem } from './spinner'
 
 const CURSOR_MAX_DISTANCE = 4
@@ -57,6 +60,7 @@ let overchargeStation: Entity | null = null
 let missionTable: Entity | null = null
 let missionTableText: Entity | null = null
 let missionStartArrow: Entity | null = null
+let pointingAtMissionStart = false
 let missionLights: Entity | null = null
 let missionLightsShowingEncounter: boolean | null = null
 let weaponLights: Entity | null = null
@@ -281,12 +285,12 @@ function WeaponLightsSystem(): void {
   applyWeaponLights(getGameState().weaponsOvercharged)
 }
 
-/** 'start' -> 0, 'encounter-N' -> N. Returns null for unknown ids. */
+/** 'start' -> 0, then each route stop in order. Returns null for unknown ids. */
 function minishipPoseIndexForStop(stopId: string): number | null {
   if (stopId === PATH_START_STOP_ID) return 0
-  const match = /^encounter-(\d+)$/.exec(stopId)
-  if (!match) return null
-  const index = Number(match[1])
+  const legIndex = SHIP_ROUTE.legs.findIndex((leg) => leg.stopId === stopId)
+  if (legIndex < 0) return null
+  const index = legIndex + 1
   return index < MINISHIP_POSES.length ? index : null
 }
 
@@ -311,10 +315,32 @@ function setEntityVisible(entity: Entity | null, visible: boolean): void {
   VisibilityComponent.createOrReplace(entity, { visible, propagateToChildren: true })
 }
 
+/** World position of the object an arrow indicates: 1.25 meters below the arrow. */
+function beamTargetBelowArrow(arrow: Entity): Vector3 {
+  const position = getWorldPosition(engine, arrow)
+  return Vector3.create(position.x, position.y - TUTORIAL_BEAM_TARGET_DROP, position.z)
+}
+
+/**
+ * While the mission has not started, keep the beam on the start arrow.
+ * Clear it once when the mission starts so console arrows can take over.
+ */
+function syncMissionStartBeam(started: boolean): void {
+  if (!started && missionStartArrow) {
+    setTutorialBeamTarget(beamTargetBelowArrow(missionStartArrow))
+    pointingAtMissionStart = true
+    return
+  }
+  if (!pointingAtMissionStart) return
+  setTutorialBeamTarget(null)
+  pointingAtMissionStart = false
+}
+
 function MissionTableSystem(): void {
   const started = getGameState().missionStarted
   setEntityVisible(missionTableText, started)
   setEntityVisible(missionStartArrow, !started)
+  syncMissionStartBeam(started)
 
   if (!missionTable) return
   if (started) {
@@ -358,9 +384,14 @@ function unfreezePlayer(): void {
 }
 
 function applyConsoleArrowVisibility(): void {
+  let shown: Entity | null = null
   for (const [id, entity] of consoleTutArrows) {
-    setEntityVisible(entity, id === activeConsoleArrowTurret && id !== occupiedTurret)
+    const visible = id === activeConsoleArrowTurret && id !== occupiedTurret
+    setEntityVisible(entity, visible)
+    if (visible) shown = entity
   }
+  if (shown) pointingAtMissionStart = false
+  setTutorialBeamTarget(shown ? beamTargetBelowArrow(shown) : null)
 }
 
 function occupyWeaponCamera(camera: Entity, turret: TurretId): void {
@@ -447,6 +478,7 @@ export function setupSceneObjects(): void {
   missionTable = null
   missionTableText = null
   missionStartArrow = null
+  pointingAtMissionStart = false
   missionLights = null
   missionLightsShowingEncounter = null
   weaponLights = null
@@ -527,6 +559,7 @@ export function setupSceneObjects(): void {
 
   if (isServer()) return
 
+  setupTutorialBeam()
   disablePlayerPassportPrompt()
   PointerLock.createOrReplace(engine.CameraEntity, { isPointerLocked: false })
 

@@ -75,12 +75,9 @@
 			"doubleSided":true,
 			"name":"Keyboard",
 			"pbrMetallicRoughness":{
-				"baseColorFactor":[
-					0.800000011920929,
-					0.800000011920929,
-					0.800000011920929,
-					1
-				],
+				"baseColorTexture":{
+					"index":0
+				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
 			}
@@ -112,7 +109,7 @@
 				1
 			],
 			"emissiveTexture":{
-				"index":0
+				"index":1
 			},
 			"extensions":{
 				"KHR_materials_emissive_strength":{
@@ -122,7 +119,7 @@
 			"name":"ConsoleScreen.001",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
-					"index":1
+					"index":2
 				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
@@ -216,11 +213,20 @@
 			"source":0
 		},
 		{
+			"sampler":0,
+			"source":1
+		},
+		{
 			"sampler":1,
-			"source":0
+			"source":1
 		}
 	],
 	"images":[
+		{
+			"mimeType":"image/png",
+			"name":"grid",
+			"uri":"grid.png"
+		},
 		{
 			"mimeType":"image/png",
 			"name":"cam_crosshair",
@@ -231,7 +237,7 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":130,
+			"count":126,
 			"max":[
 				0.6949848532676697,
 				1.4266835451126099,
@@ -247,33 +253,33 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":130,
+			"count":126,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":130,
+			"count":126,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":240,
+			"count":222,
 			"type":"SCALAR"
 		},
 		{
 			"bufferView":4,
 			"componentType":5126,
-			"count":20,
+			"count":24,
 			"max":[
 				0.6003965139389038,
-				0.21019147336483002,
+				0.19392138719558716,
 				1.360874891281128
 			],
 			"min":[
 				-0.5994734168052673,
-				0.025322776287794113,
+				0.009052696637809277,
 				0.98269122838974
 			],
 			"type":"VEC3"
@@ -281,19 +287,19 @@
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":20,
+			"count":24,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":6,
 			"componentType":5126,
-			"count":20,
+			"count":24,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":7,
 			"componentType":5123,
-			"count":30,
+			"count":36,
 			"type":"SCALAR"
 		},
 		{
@@ -396,116 +402,116 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":1560,
+			"byteLength":1512,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":1560,
-			"byteOffset":1560,
+			"byteLength":1512,
+			"byteOffset":1512,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":1040,
-			"byteOffset":3120,
+			"byteLength":1008,
+			"byteOffset":3024,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":480,
-			"byteOffset":4160,
+			"byteLength":444,
+			"byteOffset":4032,
 			"target":34963
 		},
 		{
 			"buffer":0,
-			"byteLength":240,
-			"byteOffset":4640,
+			"byteLength":288,
+			"byteOffset":4476,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":240,
-			"byteOffset":4880,
+			"byteLength":288,
+			"byteOffset":4764,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":160,
-			"byteOffset":5120,
+			"byteLength":192,
+			"byteOffset":5052,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":60,
-			"byteOffset":5280,
+			"byteLength":72,
+			"byteOffset":5244,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":48,
-			"byteOffset":5340,
+			"byteOffset":5316,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":48,
-			"byteOffset":5388,
+			"byteOffset":5364,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":32,
-			"byteOffset":5436,
+			"byteOffset":5412,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":12,
-			"byteOffset":5468,
+			"byteOffset":5444,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":48,
-			"byteOffset":5480,
+			"byteOffset":5456,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":48,
-			"byteOffset":5528,
+			"byteOffset":5504,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":32,
-			"byteOffset":5576,
+			"byteOffset":5552,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":564,
-			"byteOffset":5608,
+			"byteOffset":5584,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":564,
-			"byteOffset":6172,
+			"byteOffset":6148,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":376,
-			"byteOffset":6736,
+			"byteOffset":6712,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":336,
-			"byteOffset":7112,
+			"byteOffset":7088,
 			"target":34963
 		}
 	],
@@ -521,7 +527,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":7448,
+			"byteLength":7424,
 			"uri":"WeaponsConsole.bin"
 		}
 	]

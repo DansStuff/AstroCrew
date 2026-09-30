@@ -145,7 +145,7 @@ function ScoreboardClickSystem(): void {
     }
     const mission = rowMissions.get(entity)
     if (!mission) return
-    showRoundResults(contributionMapFromRows(mission.contributions), mission.won)
+    showRoundResults(contributionMapFromRows(mission.contributions), mission.won, mission.furthestEncounter)
     return
   }
 }
