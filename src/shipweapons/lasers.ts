@@ -9,6 +9,8 @@ import {
   SHIP_LASER_LOCAL_ORIGIN_OFFSET,
   SHIP_LASER_MAX_TARGETERS,
   SHIP_LASER_OTHER_ORIGIN_OFFSET,
+  SHIP_LASER_OTHER_ORIGIN_X_SPREAD,
+  SHIP_LASER_OTHER_WIDTH,
   SHIP_LASER_POOL_SIZE,
   SHIP_LASER_SOUND_PATH,
   SHIP_LASER_SOUND_VOICES,
@@ -29,10 +31,17 @@ type ActiveLaser = {
   origin: Vector3
   target: Entity
   remaining: number
+  width: number
 }
 
 const fallbackLocalOrigin = Vector3.add(SCENE_SHIP_POSITION, SHIP_LASER_LOCAL_ORIGIN_OFFSET)
 const otherOrigin = Vector3.add(SCENE_SHIP_POSITION, SHIP_LASER_OTHER_ORIGIN_OFFSET)
+
+/** A fresh underside origin, shifted left or right so shots do not share one muzzle. */
+function otherShotOrigin(): Vector3 {
+  const x = (Math.random() * 2 - 1) * SHIP_LASER_OTHER_ORIGIN_X_SPREAD
+  return Vector3.create(otherOrigin.x + x, otherOrigin.y, otherOrigin.z)
+}
 
 /** Muzzle of the weapon the local player locked from. */
 function localOrigin(): Vector3 {
@@ -69,14 +78,14 @@ function resetLaser(entity: Entity): void {
   VisibilityComponent.getMutable(entity).visible = false
 }
 
-function acquireLaser(target: Entity, origin: Vector3): void {
+function acquireLaser(target: Entity, origin: Vector3, width: number): void {
   const entity = laserPool.acquire()
   applyLaserMaterial(entity, isWeaponsOvercharged())
   VisibilityComponent.getMutable(entity).visible = true
   if (Transform.has(target)) {
-    poseBeamStrip(entity, origin, Transform.get(target).position, SHIP_LASER_WIDTH)
+    poseBeamStrip(entity, origin, Transform.get(target).position, width)
   }
-  active.push({ entity, origin, target, remaining: SHIP_LASER_LIFETIME_SECONDS })
+  active.push({ entity, origin, target, remaining: SHIP_LASER_LIFETIME_SECONDS, width })
   playLaserSound()
 }
 
@@ -86,12 +95,13 @@ function releaseLaser(index: number): void {
   active.splice(index, 1)
 }
 
-/** Fire `rate` shots per second at `hazard` from `origin`. The first shot fires immediately. */
+/** Fire `rate` shots per second at `hazard`. Each shot calls `originForShot`. The first shot fires immediately. */
 function advanceStream(
   elapsedByHazard: Map<Entity, number>,
   hazard: Entity,
   rate: number,
-  origin: Vector3,
+  originForShot: () => Vector3,
+  width: number,
   dt: number
 ): void {
   if (rate <= 0) {
@@ -107,7 +117,7 @@ function advanceStream(
   elapsed += dt
   while (elapsed >= interval) {
     elapsed -= interval
-    acquireLaser(hazard, origin)
+    acquireLaser(hazard, originForShot(), width)
   }
   elapsedByHazard.set(hazard, elapsed)
 }
@@ -128,8 +138,8 @@ function fireShots(dt: number): void {
     seen.add(entity)
     const localRate = isLocalTarget ? SHIP_LASER_BASE_FIRE_RATE : 0
     const otherRate = SHIP_LASER_BASE_FIRE_RATE * Math.min(otherTargeters, SHIP_LASER_MAX_TARGETERS)
-    advanceStream(localFireElapsed, entity, localRate, origin, dt)
-    advanceStream(otherFireElapsed, entity, otherRate, otherOrigin, dt)
+    advanceStream(localFireElapsed, entity, localRate, () => origin, SHIP_LASER_WIDTH, dt)
+    advanceStream(otherFireElapsed, entity, otherRate, otherShotOrigin, SHIP_LASER_OTHER_WIDTH, dt)
   })
 
   pruneDespawned(localFireElapsed, seen)
@@ -144,7 +154,7 @@ function updateActive(dt: number): void {
       releaseLaser(i)
       continue
     }
-    poseBeamStrip(laser.entity, laser.origin, Transform.get(laser.target).position, SHIP_LASER_WIDTH)
+    poseBeamStrip(laser.entity, laser.origin, Transform.get(laser.target).position, laser.width)
   }
 }
 

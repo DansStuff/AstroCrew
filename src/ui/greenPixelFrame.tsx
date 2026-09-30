@@ -59,8 +59,7 @@ export function GreenPixelFrame(props: {
             height: '100%',
             positionType: 'absolute',
             position: { top: 0, left: 0 }
-          }}
-          uiText={props.uiText}
+          }}          uiText={props.uiText}
         />
       ) : null}
       <UiEntity

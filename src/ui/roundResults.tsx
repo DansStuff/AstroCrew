@@ -1,5 +1,6 @@
 import { Color4 } from '@dcl/sdk/math'
-import ReactEcs, { Button, Label, UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
+import { GreenPixelButton } from './greenPixelFrame'
 import { UI_FONT, UI_TINT, boldUi } from '../constants'
 import { room } from '../networking/messages'
 import { contributionMapFromRows, type RoundContribution } from '../players/contributions'
@@ -123,12 +124,23 @@ export function RoundResultsUi() {
         width: '100%',
         height: '100%',
         positionType: 'absolute',
+        position: { top: 0, left: 0 },
         justifyContent: 'center',
         alignItems: 'center',
-        pointerFilter: 'block'
+        zIndex: 100
       }}
-      uiBackground={{ color: BACKDROP_COLOR }}
     >
+      {/* Dimming layer is a sibling BEHIND the panel, so it never wraps/steals clicks from the panel */}
+      <UiEntity
+        uiTransform={{
+          width: '100%',
+          height: '100%',
+          positionType: 'absolute',
+          position: { top: 0, left: 0 },
+          pointerFilter: 'block'
+        }}
+        uiBackground={{ color: BACKDROP_COLOR }}
+      />
       <UiEntity
         uiTransform={{
           width: PANEL_WIDTH,
@@ -185,6 +197,7 @@ export function RoundResultsUi() {
           uiTransform={{
             width: '100%',
             height: 340,
+            flexShrink: 0,
             flexDirection: 'column',
             overflow: 'scroll',
             margin: { bottom: 16 }
@@ -203,13 +216,10 @@ export function RoundResultsUi() {
             rows.map((row) => ResultRowView(row, row.playerId))
           )}
         </UiEntity>
-        <Button
-          value={boldUi('Close')}
-          variant="primary"
-          font={UI_FONT}
+        <GreenPixelButton
+          value="Close"
           fontSize={20}
-          color={UI_TINT}
-          uiTransform={{ width: CLOSE_WIDTH, height: CLOSE_HEIGHT }}
+          uiTransform={{ width: CLOSE_WIDTH, height: CLOSE_HEIGHT, flexShrink: 0 }}
           onMouseDown={hideRoundResults}
         />
       </UiEntity>

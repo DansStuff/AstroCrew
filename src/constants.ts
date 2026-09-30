@@ -115,7 +115,7 @@ export const SAUCER_APPROACH_SECONDS = 2
 /** Seconds between saucer shots. First shot waits one full interval after approach. */
 export const SAUCER_FIRE_INTERVAL = 2
 /** Seconds an asteroid exists before it hits the ship (unless shot). */
-export const ASTEROID_FLIGHT_TIME = 1//11
+export const ASTEROID_FLIGHT_TIME = 11
 
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   'encounter-1': {
@@ -480,6 +480,9 @@ export const SHIP_LASER_LIFETIME_SECONDS = 0.15
 /** Scene-space width of the laser plane (local X). Length is the ship-to-asteroid distance. */
 export const SHIP_LASER_WIDTH = 0.25
 
+/** Width of lasers fired for other players, from below the hull. */
+export const SHIP_LASER_OTHER_WIDTH = SHIP_LASER_WIDTH * 0.5
+
 /**
  * Offset from SCENE_SHIP_POSITION to the local player's laser origin when the weapon they
  * locked from is unknown. Normally the local laser fires from that weapon's muzzle.
@@ -488,6 +491,9 @@ export const SHIP_LASER_LOCAL_ORIGIN_OFFSET = Vector3.create(0, 7, -6)
 
 /** Offset from SCENE_SHIP_POSITION to other players' laser origin, below the hull. */
 export const SHIP_LASER_OTHER_ORIGIN_OFFSET = Vector3.create(0, -7, -6)
+
+/** Random scene-X offset (± meters) around that origin. Scene X is left/right; -Z is the bow. */
+export const SHIP_LASER_OTHER_ORIGIN_X_SPREAD = 8
 
 /** Camera-local offset from the weapon pose (+Z look, +Y up, +X right). */
 export const WEAPON_CAMERA_LOCAL_OFFSET = Vector3.create(0, -3, 2)
@@ -584,8 +590,10 @@ export const UI_CAM_INDICATOR_PATHS: Record<TurretId, string> = {
 }
 /** Both axes are this share of screen height, so the art stays square when the mobile virtual canvas is shorter than desktop. */
 export const UI_CAM_INDICATOR_SIZE = '22.22vh'
-export const UI_CAM_INDICATOR_LEFT = 180
-export const UI_CAM_INDICATOR_BOTTOM = 220
+/** Inset from the left edge, as a share of screen width. */
+export const UI_CAM_INDICATOR_LEFT = '9.4vw'
+/** Inset from the bottom edge, as a share of screen height. */
+export const UI_CAM_INDICATOR_BOTTOM = '20.4vh'
 
 // Prompt while a turret camera is up and nothing is locked
 export const UI_SELECT_TARGET_FONT_SIZE = 32
@@ -633,7 +641,9 @@ export const UI_ENGINEERING_ICON_PATH = 'assets/scene/Images/engineering.png'
 
 // Green pixel frame / buttons
 export const UI_GREEN_PIXEL_FRAME_PATH = 'assets/scene/Images/green_pixel_frame_9.png'
-export const UI_GREEN_PIXEL_FRAME_SLICES = { top: 0.4, bottom: 0.4, left: 0.4, right: 0.4 }
+// Corner art is 17px of the 128px texture. Larger slices force a minimum frame size of
+// 2x the slice, and smaller elements get the frame drawn past their bounds.
+export const UI_GREEN_PIXEL_FRAME_SLICES = { top: 0.14, bottom: 0.14, left: 0.14, right: 0.14 }
 export const UI_GREEN_PIXEL_FRAME_FILL = Color4.create(0.1, 0.2, 0.2, 0.8)
 export const UI_GREEN_PIXEL_BUTTON_HOVER_FILL = Color4.create(0.15, 0.5, 0.25, 0.8)
 export const UI_GREEN_PIXEL_BUTTON_HOVER_INSET = 8
