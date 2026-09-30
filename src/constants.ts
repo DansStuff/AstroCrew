@@ -43,6 +43,11 @@ export const SHIP_DEATH_SPIN_MAX_DEGREES_PER_SECOND = 720
 /** Time constant of the spin ramp: ~63% of max speed after this many seconds. */
 export const SHIP_DEATH_SPIN_RAMP_SECONDS = 1.5
 
+/** Repair hold at engineering level 1. */
+export const BREACH_REPAIR_HOLD_LEVEL_1_SECONDS = 1.5
+/** Repair hold at engineering level 10. */
+export const BREACH_REPAIR_HOLD_MAX_LEVEL_SECONDS = 0.5
+
 /** Hull HP restored by a level 1 engineer when a breach is repaired. */
 export const ENGINEERING_REPAIR_BASE_HP = 5
 /** Extra hull HP restored per engineering level above 1. Level 2 = 6, level 10 = 14. */
@@ -81,6 +86,16 @@ export function gunnerShotDamage(level: number): number {
 /** Hull HP restored when a breach is repaired. Level 1 = 5, then +1 each level. */
 export function engineeringRepairHp(level: number): number {
   return ENGINEERING_REPAIR_BASE_HP + (level - 1) * ENGINEERING_REPAIR_HP_PER_LEVEL
+}
+
+/** Seconds the repair button must stay down. Level 1 = 1.5, level 10 = 0.5. */
+export function engineeringRepairHoldSeconds(level: number): number {
+  const clamped = Math.min(SKILL_MAX_LEVEL, Math.max(1, Math.floor(level)))
+  const t = (clamped - 1) / (SKILL_MAX_LEVEL - 1)
+  return (
+    BREACH_REPAIR_HOLD_LEVEL_1_SECONDS +
+    t * (BREACH_REPAIR_HOLD_MAX_LEVEL_SECONDS - BREACH_REPAIR_HOLD_LEVEL_1_SECONDS)
+  )
 }
 
 /** Per-gunner damage scale from connected player count. Total DPS grows like sqrt(n). */
@@ -197,7 +212,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   Terra: {
     hpMultiplier: 1,
-    damageMultiplier: 1000,
+    damageMultiplier: 1,
     stages: [
 
       { kind: 'asteroid', turret: 'center', hazardCount: 1 },
@@ -641,6 +656,11 @@ export const UI_SELECT_TARGET_BLINK_MS = 500
 export const UI_HEALTH_BAR_WIDTH = '30%'
 export const UI_HEALTH_BAR_HEIGHT = '4%'
 export const UI_HEALTH_BAR_FONT_SIZE = 18
+
+// Repair hold, centered on the screen. Width shrinks from this size as the hold progresses.
+export const UI_REPAIR_HOLD_BAR_WIDTH = '24%'
+export const UI_REPAIR_HOLD_BAR_HEIGHT = '5%'
+export const UI_REPAIR_HOLD_BAR_FONT_SIZE = 22
 
 // Encounter stage banner
 export const UI_ENCOUNTER_STAGE_DURATION_SECONDS = 2

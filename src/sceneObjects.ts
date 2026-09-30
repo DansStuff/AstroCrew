@@ -25,6 +25,7 @@ import {
 import { Color3, Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 import { isServer, isStateSyncronized } from '@dcl/sdk/network'
 import { getPlatform, isMobile } from '@dcl/sdk/platform'
+import { getPlayer } from '@dcl/sdk/players'
 import { EntityNames } from '../assets/scene/entity-names'
 import {
   WEAPON_CAMERA_FOV_DEGREES,
@@ -37,9 +38,11 @@ import {
   type TurretId
 } from './constants'
 import { addEntitySound, clearEntitySounds, playEntitySound } from './audio/entitySounds'
-import { BREACH_REPAIR_SOUND_PATH, LOW_HP_SOUND_PATH, LOW_HP_THRESHOLD, SHIP_BASE_HULL_HP, MINISHIP_POSES, OVERCHARGE_END_SOUND_PATH, OVERCHARGE_START_SOUND_PATH, PATH_START_STOP_ID } from './constants'
+import { BREACH_REPAIR_SOUND_PATH, engineeringRepairHoldSeconds, LOW_HP_SOUND_PATH, LOW_HP_THRESHOLD, SHIP_BASE_HULL_HP, MINISHIP_POSES, OVERCHARGE_END_SOUND_PATH, OVERCHARGE_START_SOUND_PATH, PATH_START_STOP_ID } from './constants'
+import { clampSimulationStep } from './utilities'
 import { playGlobalSound, setGlobalLoop } from './audio/global'
 import { getGameState, isBreachActive } from './gamestate'
+import { getEngineeringLevel } from './players/stats'
 import { currentStopId } from './path/follow'
 import { SHIP_ROUTE } from './path/routedata'
 import { room } from './networking/messages'
@@ -68,6 +71,9 @@ let weaponLightsShowingOvercharge: boolean | null = null
 let miniship: Entity | null = null
 let minishipPoseIndex = -1
 let breachPointerEventsReady = false
+let repairHoldBreachId: number | null = null
+let repairHoldSeconds = 0
+let repairHoldRequiredSeconds = 0
 
 const LIGHT_EMISSIVE_INTENSITY = 3
 
@@ -154,7 +160,7 @@ function setBreachPointerCollider(entity: Entity, enabled: boolean): void {
 function setBreachInteractable(entity: Entity, interactable: boolean): void {
   setBreachPointerCollider(entity, interactable)
   if (interactable) {
-    attachInteractEvent(entity, 'Repair Breach!')
+    attachInteractEvent(entity, 'Repair Breach! (hold)')
   } else {
     PointerEvents.deleteFrom(entity)
   }
@@ -459,13 +465,58 @@ function BreachVisibilitySystem(): void {
   }
 }
 
-function BreachRepairSystem(): void {
-  if (!isStateSyncronized()) return
+function clearRepairHold(): void {
+  repairHoldBreachId = null
+  repairHoldSeconds = 0
+  repairHoldRequiredSeconds = 0
+}
+
+/** Remaining fraction of the repair hold, from 1 at the press to 0 as it finishes. Null when idle. */
+export function repairHoldRemaining(): number | null {
+  if (repairHoldBreachId === null || repairHoldRequiredSeconds <= 0) return null
+  const remaining = 1 - repairHoldSeconds / repairHoldRequiredSeconds
+  if (remaining <= 0) return 0
+  if (remaining >= 1) return 1
+  return remaining
+}
+
+function localEngineeringLevel(): number {
+  const userId = getPlayer()?.userId
+  if (!userId) return 1
+  return getEngineeringLevel(userId)
+}
+
+function BreachRepairSystem(dt: number): void {
+  if (!isStateSyncronized()) {
+    clearRepairHold()
+    return
+  }
+
   const state = getGameState()
+  const holdingButton = inputSystem.isPressed(InputAction.IA_POINTER)
+  const holdStillValid =
+    repairHoldBreachId !== null && holdingButton && isBreachActive(state, repairHoldBreachId)
+
+  if (!holdStillValid) clearRepairHold()
+
+  if (repairHoldBreachId !== null) {
+    repairHoldSeconds += clampSimulationStep(dt)
+    if (repairHoldSeconds >= repairHoldRequiredSeconds) {
+      const breachId = repairHoldBreachId
+      clearRepairHold()
+      room.send('requestRepairBreach', { breachId })
+    }
+    return
+  }
+
+  if (!holdingButton) return
+
   for (const [id, entity] of breachEntities) {
     if (!isBreachActive(state, id)) continue
     if (inputSystem.getInputCommand(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)) {
-      room.send('requestRepairBreach', { breachId: id })
+      repairHoldBreachId = id
+      repairHoldRequiredSeconds = engineeringRepairHoldSeconds(localEngineeringLevel())
+      return
     }
   }
 }
@@ -492,6 +543,7 @@ export function setupSceneObjects(): void {
   activeConsoleArrowTurret = null
   turretOccupied = false
   breachPointerEventsReady = false
+  clearRepairHold()
 
   const weapons = new Map<string, Entity>()
   const consoles: { entity: Entity; name: string }[] = []

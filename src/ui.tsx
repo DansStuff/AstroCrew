@@ -10,6 +10,9 @@ import {
   UI_HEALTH_BAR_FONT_SIZE,
   UI_HEALTH_BAR_HEIGHT,
   UI_HEALTH_BAR_WIDTH,
+  UI_REPAIR_HOLD_BAR_FONT_SIZE,
+  UI_REPAIR_HOLD_BAR_HEIGHT,
+  UI_REPAIR_HOLD_BAR_WIDTH,
   UI_BACK_TO_SHIP_BUTTON_FONT_SIZE,
   UI_BACK_TO_SHIP_BUTTON_HEIGHT,
   UI_BACK_TO_SHIP_BUTTON_WIDTH,
@@ -49,7 +52,7 @@ import { getGameState, isWeaponsOvercharged } from './gamestate'
 import { room } from './networking/messages'
 import { lastStopId } from './path/follow'
 import { getLocalTargetTurret } from './hazards/targeting'
-import { exitWeaponCamera, getOccupiedTurret, isTurretOccupied } from './sceneObjects'
+import { exitWeaponCamera, getOccupiedTurret, isTurretOccupied, repairHoldRemaining } from './sceneObjects'
 import { GreenPixelButton } from './ui/greenPixelFrame'
 import { RoundResultsUi, setupRoundResultsUi } from './ui/roundResults'
 import { SkillLevelsHud } from './ui/skillLevels'
@@ -132,6 +135,57 @@ function selectTargetBlinkOn(): boolean {
 
 function inMissionHud() {
   return getGameState().missionStarted && !missionEnded()
+}
+
+function RepairHoldBar() {
+  const remaining = repairHoldRemaining()
+  return (
+    <UiEntity
+      uiTransform={{
+        width: '100%',
+        height: '100%',
+        positionType: 'absolute',
+        position: { top: 0, left: 0 },
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: remaining === null ? 'none' : 'flex',
+        pointerFilter: 'none'
+      }}
+    >
+      <UiEntity
+        uiTransform={{
+          width: UI_REPAIR_HOLD_BAR_WIDTH,
+          height: UI_REPAIR_HOLD_BAR_HEIGHT,
+          justifyContent: 'center',
+          alignItems: 'center',
+          pointerFilter: 'none'
+        }}
+      >
+        <UiEntity
+          uiTransform={{
+            width: `${(remaining ?? 0) * 100}%`,
+            height: '100%',
+            pointerFilter: 'none'
+          }}
+          uiBackground={{ color: UI_TINT }}
+        />
+        <Label
+          value={boldUi('hold')}
+          font={UI_FONT}
+          fontSize={UI_REPAIR_HOLD_BAR_FONT_SIZE}
+          color={Color4.Black()}
+          textAlign="middle-center"
+          uiTransform={{
+            width: '100%',
+            height: '100%',
+            positionType: 'absolute',
+            position: { top: 0, left: 0 },
+            pointerFilter: 'none'
+          }}
+        />
+      </UiEntity>
+    </UiEntity>
+  )
 }
 
 
@@ -313,6 +367,7 @@ export const uiMenu = () => {
       />
     </UiEntity>
     ) : null}
+    <RepairHoldBar />
     <SkillLevelsHud />
     <RoundResultsUi />
   </UiEntity>
