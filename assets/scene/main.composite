@@ -1657,9 +1657,9 @@
       "data": {
         "0": {
           "json": {
-            "name": "Astro Crew",
-            "description": "Defend the ship!",
-            "thumbnail": "assets/images/thumbnail.png",
+            "name": "AstroCrew",
+            "description": "AstroCrew is a fast, drop-in co-op space adventure where every player becomes part of the crew. Blast incoming asteroids, race to repair hull breaches, and work together to keep your starship alive as you push deeper through a collapsing star system. Build your crew skills, chase deeper runs, and make it all the way to the end of the seven-planet route.",
+            "thumbnail": "assets/images/navmapThumbnail.png",
             "ageRating": "A",
             "categories": [
               "game"

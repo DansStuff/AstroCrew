@@ -7,10 +7,10 @@
   "ecs7": true,
   "runtimeVersion": "7",
   "display": {
-    "title": "Astro Crew",
-    "description": "Defend the ship!",
+    "title": "AstroCrew",
+    "description": "AstroCrew is a fast, drop-in co-op space adventure where every player becomes part of the crew. Blast incoming asteroids, race to repair hull breaches, and work together to keep your starship alive as you push deeper through a collapsing star system. Build your crew skills, chase deeper runs, and make it all the way to the end of the seven-planet route.",
     "favicon": "favicon_asset",
-    "navmapThumbnail": "assets/images/thumbnail.png"
+    "navmapThumbnail": "assets/images/navmapThumbnail.png"
   },
   "owner": "",
   "contact": {
