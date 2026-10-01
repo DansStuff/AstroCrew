@@ -1,5 +1,6 @@
 import { engine, Entity, Name, Schemas, Transform, VirtualCamera } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
+import { isMobile } from '@dcl/sdk/platform'
 import { EntityNames } from '../../assets/scene/entity-names'
 import {
   CAMERA_SHAKE_DEFAULT_DURATION_SECONDS,
@@ -74,6 +75,7 @@ export function shakeShip(
   intensity = CAMERA_SHAKE_DEFAULT_INTENSITY,
   durationSeconds = CAMERA_SHAKE_DEFAULT_DURATION_SECONDS
 ): void {
+  if (isMobile()) return
   const ship = findShip()
   if (ship !== undefined) shakeEntity(ship, intensity, durationSeconds)
 }
