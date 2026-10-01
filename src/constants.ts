@@ -213,7 +213,7 @@ export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
 export const ENCOUNTER_PARAMS: Record<string, EncounterParams> = {
   Terra: {
     hpMultiplier: 1,
-    damageMultiplier: 1,
+    damageMultiplier: 1000,
     stages: [
 
       { kind: 'asteroid', turret: 'center', hazardCount: 1 },

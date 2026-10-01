@@ -8,7 +8,8 @@
 		{
 			"name":"Scene",
 			"nodes":[
-				9
+				9,
+				10
 			]
 		}
 	],
@@ -87,6 +88,20 @@
 				8
 			],
 			"name":"ShipOrigin"
+		},
+		{
+			"mesh":9,
+			"name":"powercell_collider",
+			"scale":[
+				0.777122974395752,
+				2.3745322227478027,
+				0.777122974395752
+			],
+			"translation":[
+				0,
+				2.8496787548065186,
+				11.7088623046875
+			]
 		}
 	],
 	"materials":[
@@ -294,6 +309,19 @@
 					},
 					"indices":51,
 					"material":2
+				}
+			]
+		},
+		{
+			"name":"Cylinder.007",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":52,
+						"NORMAL":53,
+						"TEXCOORD_0":54
+					},
+					"indices":55
 				}
 			]
 		}
@@ -740,6 +768,40 @@
 			"componentType":5123,
 			"count":108,
 			"type":"SCALAR"
+		},
+		{
+			"bufferView":52,
+			"componentType":5126,
+			"count":96,
+			"max":[
+				1.5004944801330566,
+				1,
+				1.5004949569702148
+			],
+			"min":[
+				-1.5004944801330566,
+				-1,
+				-1.5004940032958984
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":53,
+			"componentType":5126,
+			"count":96,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":54,
+			"componentType":5126,
+			"count":96,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":55,
+			"componentType":5123,
+			"count":180,
+			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
@@ -1054,11 +1116,35 @@
 			"byteLength":216,
 			"byteOffset":135928,
 			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":1152,
+			"byteOffset":136144,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":1152,
+			"byteOffset":137296,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":768,
+			"byteOffset":138448,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":360,
+			"byteOffset":139216,
+			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":136144,
+			"byteLength":139576,
 			"uri":"Ship.bin"
 		}
 	]

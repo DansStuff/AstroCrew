@@ -1666,14 +1666,8 @@
             ],
             "author": "Dan",
             "email": "",
-            "tags": [
-              ""
-            ],
+            "tags": [],
             "layout": {
-              "base": {
-                "x": 0,
-                "y": 0
-              },
               "parcels": [
                 {
                   "x": 0,
@@ -1963,7 +1957,11 @@
                   "x": 7,
                   "y": 0
                 }
-              ]
+              ],
+              "base": {
+                "x": 0,
+                "y": 0
+              }
             },
             "silenceVoiceChat": false,
             "disablePortableExperiences": false,
@@ -1980,8 +1978,11 @@
                     ]
                   },
                   "y": {
-                    "$case": "single",
-                    "value": 63.58000183105469
+                    "$case": "range",
+                    "value": [
+                      63.58000183105469,
+                      63.58000183105469
+                    ]
                   },
                   "z": {
                     "$case": "range",
