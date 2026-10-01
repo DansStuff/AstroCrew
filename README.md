@@ -68,3 +68,7 @@ Installed from the `auth-server` branch:
 | `@dcl/js-runtime` | `7.27.1-33086747846.commit-824d240` |
 
 Auth-server commit: `824d240`.
+
+## Known issues
+
+Shaking the ship entity makes the player fall through the hull on the mobile client. `shakeShip` in `src/effects/cameraShake.ts` returns immediately when `isMobile()` is true (line 78), so impacts and the death spin still shake the camera but leave the ship still. Desktop is unchanged. That early return can come out if a future mobile client stops dropping the player when the ship transform jitters.
