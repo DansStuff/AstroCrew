@@ -66,7 +66,7 @@ export const SHIP_LASER_MAX_TARGETERS = 5
 export const HAZARD_DAMAGE_INTERVAL = 0.5
 
 /** Damage dealt by a level 1 gunner each damage tick. */
-export const GUNNER_BASE_DAMAGE = 10
+export const GUNNER_BASE_DAMAGE = 12
 /** Extra damage per gunner level above 1. Level 2 = 12, level 10 = 28. */
 export const GUNNER_DAMAGE_PER_LEVEL = 2
 
