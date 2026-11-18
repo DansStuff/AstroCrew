@@ -22,7 +22,8 @@ import {
   HAZARD_TARGETING_PORTRAIT_SCALE,
   HAZARD_TARGETING_PORTRAIT_START_ANGLE_DEGREES,
   HAZARD_TARGETING_PORTRAIT_STEP_DEGREES,
-  HAZARD_TARGETING_PORTRAIT_Z
+  HAZARD_TARGETING_PORTRAIT_Z,
+  HAZARD_TEXT_OUTLINE_WIDTH
 } from './constants'
 /** Crosshair billboard on a hazard, with the local lock label and targeter portraits as children. */
 export type TargetingReticule = {
@@ -115,7 +116,7 @@ export function createTargetingReticule(hazard: Entity): TargetingReticule {
     fontSize: HAZARD_TARGETING_LOCKED_FONT_SIZE,
     textColor: Color4.Green(),
     outlineColor: Color4.Black(),
-    outlineWidth: 0.2,
+    outlineWidth: HAZARD_TEXT_OUTLINE_WIDTH,
     textAlign: TextAlignMode.TAM_BOTTOM_CENTER
   })
   VisibilityComponent.create(lockedLabel, { visible: false })

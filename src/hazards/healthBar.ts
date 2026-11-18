@@ -21,7 +21,8 @@ import {
   HAZARD_HEALTH_BAR_TEXT_FONT_SIZE,
   HAZARD_HEALTH_BAR_TEXT_OFFSET_Y,
   HAZARD_HEALTH_BAR_TRACK_COLOR,
-  HAZARD_HEALTH_BAR_WIDTH
+  HAZARD_HEALTH_BAR_WIDTH,
+  HAZARD_TEXT_OUTLINE_WIDTH
 } from './constants'
 import { rotateByInverse } from '../utilities'
 
@@ -89,7 +90,7 @@ export function createHealthBar(hazard: Entity, kind: HazardKind): HealthBar {
     fontSize: HAZARD_HEALTH_BAR_TEXT_FONT_SIZE,
     textColor: Color4.White(),
     outlineColor: Color4.Black(),
-    outlineWidth: 0.2,
+    outlineWidth: HAZARD_TEXT_OUTLINE_WIDTH,
     textAlign: TextAlignMode.TAM_BOTTOM_CENTER
   })
   VisibilityComponent.create(label, { visible: false })

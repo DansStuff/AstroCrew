@@ -55,6 +55,9 @@ export const HAZARD_TARGETING_LOCKED_OFFSET = Vector3.create(0, 0.55, -0.1)
 /** TextShape fontSize for the local-player lock label. Inverse-scaled by the reticule parent. */
 export const HAZARD_TARGETING_LOCKED_FONT_SIZE = 8
 
+/** Black outline width on hazard TextShapes ("Target Locked" and the health bar label). */
+export const HAZARD_TEXT_OUTLINE_WIDTH = 0.8
+
 export const HAZARD_SELECT_SOUND_PATH = 'assets/scene/Sounds/select1.mp3'
 export const HAZARD_HIT_SHIP_SOUND_PATH = 'assets/scene/Sounds/boom1.mp3'
 
