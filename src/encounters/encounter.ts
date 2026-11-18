@@ -10,10 +10,10 @@ import {
   BASE_SAUCER_HP,
   ENCOUNTER_PARAMS,
   ENCOUNTER_STAGE_TELEGRAPH_SECONDS,
-  HAZARD_SPAWN_INTERVAL,
   type EncounterParams,
-  type EncounterStage
-} from '../constants'
+  type EncounterStage,
+  HAZARD_SPAWN_INTERVAL
+} from '../gamebalance/constants'
 import { getGameState } from '../gamestate'
 import { clearLive, hasLive, spawn, tick } from '../hazards/simulation'
 import { clampSimulationStep } from '../utilities'

@@ -1,6 +1,5 @@
 import { getPlayer } from '@dcl/sdk/players'
-import { PATH_START_STOP_ID } from '../constants'
-
+import { PATH_START_STOP_ID } from '../path/constants'
 export type RoundContribution = {
   name: string
   damage: number

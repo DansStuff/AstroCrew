@@ -1,7 +1,6 @@
 import { AudioSource, engine, Entity, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { SCENE_SHIP_POSITION } from '../constants'
-
 const entities = new Map<string, Entity>()
 
 function entityFor(path: string): Entity {

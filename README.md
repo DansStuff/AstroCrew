@@ -29,7 +29,7 @@ On the map:
 - **Add waypoint** extends the open path. The first waypoint is Start and is not an encounter. The path does not loop. Double-click a later waypoint to toggle a stop.
 - **Remove waypoint** deletes the point you click.
 - **Add planet** places a planet. The inspector sets its name, model path, XZ, and radius.
-- **Play** / **Reset** preview cruise, hold time, and accel/decel. Those playback numbers are for the editor; the scene's cruise speed and path sampling live in `src/constants.ts`.
+- **Play** / **Reset** preview cruise, hold time, and accel/decel. Those playback numbers are for the editor; the scene's cruise speed and path sampling live in `src/path/constants.ts`.
 
 ## Source layout
 
@@ -40,6 +40,7 @@ On the map:
 | `audio/` | Global and per-entity sounds |
 | `effects/` | Camera shake, death spin, beams |
 | `encounters/` | One server-side fight, plus client encounter presentation |
+| `gamebalance/` | Difficulty tuning: damage, HP, XP, timing, and the per-stop encounter table |
 | `gamestate/` | Synced state, schema, and the mission state machine |
 | `hazards/` | Asteroid and saucer simulation, targeting, and visuals |
 | `leaderboard/` | Round scoreboard and weekly board |
@@ -52,11 +53,25 @@ On the map:
 
 Files that sit next to those folders (`sceneObjects.ts`, `ship.ts`, `utilities.ts`, `objectPool.ts`) are shared by more than one domain.
 
-## `src/constants.ts`
+## Constants
 
-All tuning lives here: hull, damage, XP, spawn timing, path sampling, projection, weapons, and HUD layout. Sections are marked in the file (`Simulation`, `Difficulty`, `Ship`, `Miniship`, `Path`, `Projection`, `Stars`, `Hazards`, `Ship Weapons`, `Encounters`, `UI`).
+Tuning lives in a `constants.ts` inside each domain folder, next to the code that reads it:
 
-`ENCOUNTER_PARAMS` is the per-stop combat table. Each key is a stop id from the map (Terra, Vaelith, and the rest) and sets that encounter's HP and damage multipliers plus its asteroid and saucer stages. Planet positions and the path itself are not in this file; the map editor owns those in `src/path/routedata.ts`.
+| File | What it tunes |
+| --- | --- |
+| `gamebalance/constants.ts` | All difficulty tuning in one place: hull HP, death spin, repair, gunner damage, hazard HP/damage, fire rates, overcharge, XP curves, spawn timing, `ENCOUNTER_PARAMS` |
+| `src/constants.ts` | Shared ship values: scene anchor, interior radius, low-HP alarm, Miniship poses |
+| `effects/constants.ts` | Camera shake, tutorial beam |
+| `encounters/constants.ts` | Encounter sounds |
+| `hazards/constants.ts` | Asteroid and saucer visuals, pools, spawn placement, saucer beam |
+| `path/constants.ts` | Cruise speed, banking, path sampling |
+| `shipweapons/constants.ts` | Laser visuals, weapon cameras, overcharge sounds |
+| `spaceobjects/constants.ts` | Projection shell, planets, stars |
+| `ui/constants.ts` | HUD layout, fonts, colors |
+
+Each file is split into sections with `MARK` comments. Balance changes go in `gamebalance/constants.ts` even when the value is read by another domain, so difficulty can be tuned without hunting across folders.
+
+`ENCOUNTER_PARAMS` in `gamebalance/constants.ts` is the per-stop combat table. Each key is a stop id from the map (Terra, Vaelith, and the rest) and sets that encounter's HP and damage multipliers plus its asteroid and saucer stages. Planet positions and the path itself are not in this file; the map editor owns those in `src/path/routedata.ts`.
 
 ## SDK
 

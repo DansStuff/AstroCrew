@@ -27,18 +27,21 @@ import { isServer, isStateSyncronized } from '@dcl/sdk/network'
 import { getPlatform, isMobile } from '@dcl/sdk/platform'
 import { getPlayer } from '@dcl/sdk/players'
 import { EntityNames } from '../assets/scene/entity-names'
+import { BREACH_REPAIR_SOUND_PATH, LOW_HP_SOUND_PATH, LOW_HP_THRESHOLD, MINISHIP_POSES } from './constants'
+import { TUTORIAL_BEAM_TARGET_DROP } from './effects/constants'
+import { engineeringRepairHoldSeconds, SHIP_BASE_HULL_HP, type TurretId } from './gamebalance/constants'
+import { PATH_START_STOP_ID } from './path/constants'
 import {
+  OVERCHARGE_END_SOUND_PATH,
+  OVERCHARGE_START_SOUND_PATH,
   WEAPON_CAMERA_FOV_DEGREES,
   WEAPON_CAMERA_LOCAL_OFFSET,
   WEAPON_CAMERA_TRANSITION_SECONDS,
   WEAPON_LIGHT_COLOR,
   WEAPON_LIGHT_OVERCHARGE_COLOR,
-  WEAPON_MUZZLE_LOCAL_OFFSET,
-  TUTORIAL_BEAM_TARGET_DROP,
-  type TurretId
-} from './constants'
+  WEAPON_MUZZLE_LOCAL_OFFSET
+} from './shipweapons/constants'
 import { addEntitySound, clearEntitySounds, playEntitySound } from './audio/entitySounds'
-import { BREACH_REPAIR_SOUND_PATH, engineeringRepairHoldSeconds, LOW_HP_SOUND_PATH, LOW_HP_THRESHOLD, SHIP_BASE_HULL_HP, MINISHIP_POSES, OVERCHARGE_END_SOUND_PATH, OVERCHARGE_START_SOUND_PATH, PATH_START_STOP_ID } from './constants'
 import { clampSimulationStep } from './utilities'
 import { playGlobalSound, setGlobalLoop } from './audio/global'
 import { getGameState, isBreachActive } from './gamestate'

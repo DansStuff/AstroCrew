@@ -1,4 +1,4 @@
-import { PATH_START_STOP_ID } from '../constants'
+import { PATH_START_STOP_ID } from '../path/constants'
 import { SHIP_ROUTE } from '../path/routedata'
 import { type MissionRecord } from '../players/contributions'
 

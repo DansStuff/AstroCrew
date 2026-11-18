@@ -4,6 +4,12 @@ Each domain folder holds the code for one gameplay concern: path (route follow),
 
 src/index.ts is the composition root. It wires domains (setupEncounters, setupHazards, setupSpaceObjects, the ship path system) and keeps the mission room plus HUD at that layer. Truly shared math and the debug teleport stay in utilities.ts. The visible ship entity and its virtual pose stay in ship.ts because many domains read and write them. The HUD stays in ui.tsx. Authored map data stays in path/routedata.ts because the path editor overwrites that file.
 
-Tunable numbers and strings live in src/constants.ts so they can be adjusted in one place. They are grouped by feature. Each group starts with a MARK comment so the VS Code outline can jump to Ship, Path, Projection, Hazards, and so on. Names are prefixed and spelled out so they still make sense in that file, away from the original module (for example PATH_START_STOP_ID, PLANET_ENCLOSING_SPHERE_RADIUS, HAZARD_SPAWN_INTERVAL).
+Tunable numbers and strings live in a constants.ts inside each domain folder (hazards/constants.ts, path/constants.ts, ui/constants.ts, and so on), next to the code that reads them. A domain with nothing to tune has no constants file.
 
-Constants.ts is for tuning, not for everything that happens to be a const. Route table data stays in routedata.ts. Message schemas stay in networking/messages.ts. ECS components stay next to the systems that define them.
+Difficulty is the exception: everything that affects game balance lives together in gamebalance/constants.ts, whichever domain reads it. That covers hull HP, death spin length, repair amounts and hold times, gunner damage, hazard HP and damage, fire rates, aim assist, overcharge strength, XP curves, spawn timing, and the per-stop ENCOUNTER_PARAMS table, plus the types that table uses (TurretId, HazardKind, EncounterStage). Keep that file to balance only. Sounds, models, and visual tuning for the same features go in their own domain's constants.ts.
+
+Values shared by the root files (ship.ts, sceneObjects.ts, utilities.ts), such as SCENE_SHIP_POSITION and the Miniship poses, stay in src/constants.ts. Put any other new constant in the folder of the domain it describes, even when another domain also reads it, and import it from there. Root src/constants.ts is only for values that belong to no single domain.
+
+Inside each file, groups start with a MARK comment so the VS Code outline can jump between them. Names are prefixed and spelled out so they still make sense when imported elsewhere (for example PATH_START_STOP_ID, PLANET_ENCLOSING_SPHERE_RADIUS, HAZARD_SPAWN_INTERVAL).
+
+The constants files are for tuning, not for everything that happens to be a const. Route table data stays in routedata.ts. Message schemas stay in networking/messages.ts. ECS components stay next to the systems that define them.

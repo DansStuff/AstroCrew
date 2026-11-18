@@ -1,12 +1,7 @@
 import { engine, Schemas, Transform, VisibilityComponent } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import {
-  CELESTIAL_SPHERE_INSET,
-  PLANET_ENCLOSING_SPHERE_RADIUS,
-  PROJECTED_BODY_MIN_SCALE,
-  SCENE_SHIP_POSITION,
-  SHIP_INTERIOR_RADIUS
-} from '../constants'
+import { SCENE_SHIP_POSITION, SHIP_INTERIOR_RADIUS } from '../constants'
+import { CELESTIAL_SPHERE_INSET, PLANET_ENCLOSING_SPHERE_RADIUS, PROJECTED_BODY_MIN_SCALE } from './constants'
 import { shipVirtualPosition, shipVirtualRotation } from '../ship'
 import { conjugateQuaternion, directionFromTo, rotateByInverse } from '../utilities'
 

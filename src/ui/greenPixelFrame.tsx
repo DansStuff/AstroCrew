@@ -1,16 +1,15 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { UiEntity, type UiTransformProps } from '@dcl/sdk/react-ecs'
 import {
-  UI_FONT,
-  UI_TINT,
   boldUi,
+  UI_FONT,
   UI_GREEN_PIXEL_BUTTON_HOVER_FILL,
   UI_GREEN_PIXEL_BUTTON_HOVER_INSET,
   UI_GREEN_PIXEL_FRAME_FILL,
   UI_GREEN_PIXEL_FRAME_PATH,
-  UI_GREEN_PIXEL_FRAME_SLICES
-} from '../constants'
-
+  UI_GREEN_PIXEL_FRAME_SLICES,
+  UI_TINT
+} from './constants'
 export const greenPixelFrameBackground = {
   color: UI_TINT,
   texture: { src: UI_GREEN_PIXEL_FRAME_PATH },

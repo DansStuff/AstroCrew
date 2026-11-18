@@ -7,21 +7,23 @@ import { engine, PlayerIdentityData } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
 import {
-  ASTEROID_SPAWN_SPREAD_X_DEGREES,
-  ASTEROID_SPAWN_SPREAD_Y_DEGREES,
-  HAZARD_DAMAGE_INTERVAL,
-  HAZARD_SPAWN_DISTANCE,
-  OVERCHARGE_DAMAGE_MULTIPLIER,
   ASTEROID_FLIGHT_TIME,
+  gunnerShotDamage,
+  HAZARD_DAMAGE_INTERVAL,
+  type HazardKind,
+  OVERCHARGE_DAMAGE_MULTIPLIER,
+  playerCountDamageMultiplier,
   SAUCER_APPROACH_SECONDS,
   SAUCER_FIRE_INTERVAL,
-  SAUCER_HOVER_DISTANCE,
   SKILL_XP_PER_GUNNER_HIT,
-  gunnerShotDamage,
-  playerCountDamageMultiplier,
-  type HazardKind,
   type TurretId
-} from '../constants'
+} from '../gamebalance/constants'
+import {
+  ASTEROID_SPAWN_SPREAD_X_DEGREES,
+  ASTEROID_SPAWN_SPREAD_Y_DEGREES,
+  HAZARD_SPAWN_DISTANCE,
+  SAUCER_HOVER_DISTANCE
+} from './constants'
 import { activateRandomBreach, damageShipHull, isWeaponsOvercharged } from '../gamestate'
 import { addDamage } from '../players/contributions'
 import { awardSkillXp, getGunnerLevel } from '../players/stats'

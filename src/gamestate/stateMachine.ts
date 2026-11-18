@@ -9,10 +9,10 @@ import { createWaveEncounter, type Encounter } from '../encounters/encounter'
 import {
   ENCOUNTER_PARAMS,
   engineeringRepairHp,
-  PATH_START_STOP_ID,
   SHIP_DEATH_SPIN_SECONDS,
   SKILL_XP_PER_REPAIR
-} from '../constants'
+} from '../gamebalance/constants'
+import { PATH_START_STOP_ID } from '../path/constants'
 import { setPlayerTarget, configureHazardNotifies, resetLive } from '../hazards/simulation'
 import { isPathFinished, resetPathToStart, resumeFromStop, setOnStopReached } from '../path/follow'
 import { getWeeklyBoardSnapshot, recordWeeklyMission } from '../leaderboard/weeklyBoard'

@@ -23,8 +23,7 @@ import {
   HAZARD_TARGETING_PORTRAIT_START_ANGLE_DEGREES,
   HAZARD_TARGETING_PORTRAIT_STEP_DEGREES,
   HAZARD_TARGETING_PORTRAIT_Z
-} from '../constants'
-
+} from './constants'
 /** Crosshair billboard on a hazard, with the local lock label and targeter portraits as children. */
 export type TargetingReticule = {
   indicator: Entity

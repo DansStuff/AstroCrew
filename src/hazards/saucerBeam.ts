@@ -1,5 +1,6 @@
 import { Entity, Material, Transform, VisibilityComponent } from '@dcl/sdk/ecs'
 import { Color4, Vector3 } from '@dcl/sdk/math'
+import { SCENE_SHIP_POSITION } from '../constants'
 import {
   SAUCER_BEAM_COLOR,
   SAUCER_BEAM_EMISSIVE_INTENSITY,
@@ -8,9 +9,8 @@ import {
   SAUCER_BEAM_TARGET_X_SPREAD,
   SAUCER_BEAM_WIDTH,
   SAUCER_BEAM_WIDTH_PULSE_AMPLITUDE,
-  SAUCER_BEAM_WIDTH_PULSE_PERIOD,
-  SCENE_SHIP_POSITION
-} from '../constants'
+  SAUCER_BEAM_WIDTH_PULSE_PERIOD
+} from './constants'
 import { createBeamStrip, poseBeamStrip } from '../effects/beamStrip'
 
 /** Pooled with its saucer. `target` is the current impact point while hovering. */

@@ -1,7 +1,6 @@
 import { engine, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { SCENE_SHIP_POSITION } from './constants'
-
 // NOTE: the ship should be synced once multiplayer is implemented
 export const ship = engine.addEntity()
 

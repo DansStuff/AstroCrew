@@ -1,8 +1,14 @@
 import { engine, Entity, Schemas } from '@dcl/sdk/ecs'
 import { isServer, syncEntity } from '@dcl/sdk/network'
 import { AUTH_SERVER_PEER_ID } from '@dcl/sdk/network/message-bus-sync'
-import { DOUBLE_XP_MULTIPLIER, ENGINEERING_XP_GROWTH, ENGINEERING_XP_LEVEL_1, GUNNER_XP_GROWTH, GUNNER_XP_LEVEL_1, SKILL_MAX_LEVEL } from '../constants'
-
+import {
+  DOUBLE_XP_MULTIPLIER,
+  ENGINEERING_XP_GROWTH,
+  ENGINEERING_XP_LEVEL_1,
+  GUNNER_XP_GROWTH,
+  GUNNER_XP_LEVEL_1,
+  SKILL_MAX_LEVEL
+} from '../gamebalance/constants'
 export const PlayerStats = engine.defineComponent('game:PlayerStats', {
   playerId: Schemas.String,
   gunnerLevel: Schemas.Int,

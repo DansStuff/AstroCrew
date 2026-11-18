@@ -1,10 +1,7 @@
 import { engine, Entity } from '@dcl/sdk/ecs'
 import { isServer, syncEntity } from '@dcl/sdk/network'
-import {
-  OVERCHARGE_DURATION_SECONDS,
-  PATH_START_STOP_ID,
-  SHIP_BASE_HULL_HP
-} from '../constants'
+import { OVERCHARGE_DURATION_SECONDS, SHIP_BASE_HULL_HP } from '../gamebalance/constants'
+import { PATH_START_STOP_ID } from '../path/constants'
 import { isPathFinished, resumeFromStop, teleportToStop } from '../path/follow'
 import { clampSimulationStep } from '../utilities'
 import { GameState, type GameStateSnapshot } from './schema'

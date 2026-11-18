@@ -1,13 +1,12 @@
 import { AudioSource, engine, Entity, Material, Transform, VisibilityComponent } from '@dcl/sdk/ecs'
 import { Color4, Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
+import { SCENE_SHIP_POSITION } from '../constants'
+import { SHIP_LASER_BASE_FIRE_RATE, SHIP_LASER_MAX_TARGETERS } from '../gamebalance/constants'
 import {
-  SCENE_SHIP_POSITION,
-  SHIP_LASER_BASE_FIRE_RATE,
   SHIP_LASER_EMISSIVE_INTENSITY,
   SHIP_LASER_LIFETIME_SECONDS,
   SHIP_LASER_LOCAL_ORIGIN_OFFSET,
-  SHIP_LASER_MAX_TARGETERS,
   SHIP_LASER_OTHER_ORIGIN_OFFSET,
   SHIP_LASER_OTHER_ORIGIN_X_SPREAD,
   SHIP_LASER_OTHER_WIDTH,
@@ -17,7 +16,7 @@ import {
   SHIP_LASER_WIDTH,
   WEAPON_LIGHT_COLOR,
   WEAPON_LIGHT_OVERCHARGE_COLOR
-} from '../constants'
+} from './constants'
 import { createBeamStrip, poseBeamStrip } from '../effects/beamStrip'
 import { isWeaponsOvercharged } from '../gamestate'
 import { getLocalTargetTurret } from '../hazards/targeting'

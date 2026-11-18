@@ -1,9 +1,8 @@
 import { Animator, ColliderLayer, engine, Entity, GltfContainer, Transform, VisibilityComponent } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
+import { CAMERA_SHAKE_HAZARD_IMPACT_INTENSITY, CAMERA_SHAKE_SAUCER_SHOT_INTENSITY } from '../effects/constants'
+import { type HazardKind } from '../gamebalance/constants'
 import {
-  ASTEROID_ENCLOSING_SPHERE_RADIUS,
-  CAMERA_SHAKE_HAZARD_IMPACT_INTENSITY,
-  CAMERA_SHAKE_SAUCER_SHOT_INTENSITY,
   HAZARD_ASTEROID_MODEL_PATH,
   HAZARD_ASTEROID_POOL_SIZE,
   HAZARD_HIT_SHIP_SOUND_PATH,
@@ -12,9 +11,9 @@ import {
   HAZARD_SAUCER_MODEL_PATH,
   HAZARD_SAUCER_POOL_SIZE,
   HAZARD_SAUCER_RADIUS,
-  SAUCER_HOVER_DISTANCE,
-  type HazardKind
-} from '../constants'
+  SAUCER_HOVER_DISTANCE
+} from './constants'
+import { ASTEROID_ENCLOSING_SPHERE_RADIUS } from '../spaceobjects/constants'
 import { playGlobalSound } from '../audio/global'
 import { room } from '../networking/messages'
 import { shakeCameras, shakeShip } from '../effects/cameraShake'

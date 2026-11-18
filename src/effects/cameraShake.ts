@@ -7,8 +7,7 @@ import {
   CAMERA_SHAKE_DEFAULT_INTENSITY,
   CAMERA_SHAKE_MAX_ANGLE_DEGREES,
   CAMERA_SHAKE_MAX_OFFSET
-} from '../constants'
-
+} from './constants'
 /** Active shake. `basePosition` / `baseRotation` are the rest pose restored when the shake ends. */
 export const CameraShake = engine.defineComponent('CameraShake', {
   basePosition: Schemas.Vector3,

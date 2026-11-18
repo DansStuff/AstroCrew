@@ -4,11 +4,10 @@ import { getPlayer } from '@dcl/sdk/players'
 import { playGlobalSound } from '../audio/global'
 import {
   HAZARD_AIM_CONE_HALF_ANGLE_DEGREES,
-  HAZARD_RAYCAST_MAX_DISTANCE,
-  HAZARD_SELECT_SOUND_PATH,
   HAZARD_TARGET_COOLDOWN_SECONDS,
   type TurretId
-} from '../constants'
+} from '../gamebalance/constants'
+import { HAZARD_RAYCAST_MAX_DISTANCE, HAZARD_SELECT_SOUND_PATH } from './constants'
 import { room } from '../networking/messages'
 import { getOccupiedTurret, isTurretOccupied } from '../sceneObjects'
 import { applyReticule } from './reticule'

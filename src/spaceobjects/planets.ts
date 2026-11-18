@@ -18,7 +18,7 @@ import {
   STAR_SPAWN_COUNT_DEFAULT,
   STAR_SPAWN_DISTANCE,
   STAR_VIRTUAL_RADIUS
-} from '../constants'
+} from './constants'
 import { SHIP_ROUTE } from '../path/route'
 import { shipVirtualPosition, shipVirtualRotation } from '../ship'
 import { directionFromTo, rotateByInverse } from '../utilities'

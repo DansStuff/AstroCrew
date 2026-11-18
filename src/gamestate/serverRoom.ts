@@ -2,7 +2,8 @@
  * The only server `room.onMessage` / `room.send`. Imported by the state
  * machine; other server modules notify through it, they do not import `room`.
  */
-import { PATH_START_STOP_ID, type HazardKind } from '../constants'
+import { type HazardKind } from '../gamebalance/constants'
+import { PATH_START_STOP_ID } from '../path/constants'
 import { room } from '../networking/messages'
 
 export type HazardSpawnNotify = {

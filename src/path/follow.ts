@@ -75,7 +75,7 @@ import {
   SHIP_MAX_BANK_DEGREES,
   SHIP_MODEL_YAW_DEGREES,
   SHIP_ROLL_SMOOTH
-} from '../constants'
+} from './constants'
 import { shipVirtualPosition, shipVirtualRotation } from '../ship'
 import { clampSimulationStep } from '../utilities'
 import { SHIP_ROUTE, type ShipRoute } from './route'

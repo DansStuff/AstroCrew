@@ -1,7 +1,6 @@
 import { engine, Entity, Schemas, Transform, VisibilityComponent } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { HAZARD_SPIN_DEGREES_PER_SECOND } from '../constants'
-
+import { HAZARD_SPIN_DEGREES_PER_SECOND } from '../hazards/constants'
 /**
  * Apply local rotation on top of ProjectedBody celestial orientation.
  * With no fields set: random axis at HAZARD_SPIN_DEGREES_PER_SECOND (asteroids).

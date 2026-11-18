@@ -1,7 +1,8 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { GreenPixelButton } from './greenPixelFrame'
-import { PATH_START_STOP_ID, UI_FONT, UI_TINT, boldUi } from '../constants'
+import { PATH_START_STOP_ID } from '../path/constants'
+import { boldUi, UI_FONT, UI_TINT } from './constants'
 import { room } from '../networking/messages'
 import { contributionMapFromRows, type RoundContribution } from '../players/contributions'
 

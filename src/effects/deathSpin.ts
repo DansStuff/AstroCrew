@@ -13,11 +13,10 @@ import {
   CAMERA_SHAKE_DEATH_MAX_INTENSITY,
   CAMERA_SHAKE_DEATH_MAX_INTERVAL,
   CAMERA_SHAKE_DEATH_MIN_INTENSITY,
-  CAMERA_SHAKE_DEATH_MIN_INTERVAL,
-  HAZARD_HIT_SHIP_SOUND_PATH,
-  SHIP_DEATH_SPIN_MAX_DEGREES_PER_SECOND,
-  SHIP_DEATH_SPIN_RAMP_SECONDS
-} from '../constants'
+  CAMERA_SHAKE_DEATH_MIN_INTERVAL
+} from './constants'
+import { SHIP_DEATH_SPIN_MAX_DEGREES_PER_SECOND, SHIP_DEATH_SPIN_RAMP_SECONDS } from '../gamebalance/constants'
+import { HAZARD_HIT_SHIP_SOUND_PATH } from '../hazards/constants'
 import { playGlobalSound } from '../audio/global'
 import { shipVirtualRotation } from '../ship'
 import { clampSimulationStep } from '../utilities'

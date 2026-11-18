@@ -10,7 +10,7 @@ import {
   UI_BREACH_RECT_HALF_HEIGHT,
   UI_BREACH_RECT_HALF_WIDTH,
   UI_ENGINEERING_ICON_PATH
-} from '../constants'
+} from './constants'
 import { getGameState, isBreachActive } from '../gamestate'
 import { getBreachWorldPositions, isTurretOccupied } from '../sceneObjects'
 

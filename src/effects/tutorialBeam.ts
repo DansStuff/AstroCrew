@@ -15,7 +15,7 @@ import {
   TUTORIAL_BEAM_TEXTURE_REPEATS,
   TUTORIAL_BEAM_WAIST_HEIGHT,
   TUTORIAL_BEAM_WIDTH
-} from '../constants'
+} from './constants'
 import { createBeamStrip, poseBeamStrip } from './beamStrip'
 
 let tutorialBeam: Entity | null = null

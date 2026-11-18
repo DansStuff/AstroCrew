@@ -2,10 +2,9 @@ import { Color4 } from '@dcl/sdk/math'
 import { getPlayer } from '@dcl/sdk/players'
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import {
+  boldUi,
   UI_ENGINEERING_ICON_PATH,
   UI_FONT,
-  UI_TINT,
-  boldUi,
   UI_GUNNER_ICON_PATH,
   UI_HUD_EDGE_PADDING_X,
   UI_HUD_EDGE_PADDING_Y,
@@ -25,8 +24,9 @@ import {
   UI_SKILL_PANEL_WIDTH,
   UI_SKILL_TEXT_ROW_HEIGHT,
   UI_SKILL_XP_BAR_HEIGHT,
-  UI_SKILL_XP_BAR_MARGIN_TOP
-} from '../constants'
+  UI_SKILL_XP_BAR_MARGIN_TOP,
+  UI_TINT
+} from './constants'
 import {
   DEFAULT_PLAYER_STATS,
   getPlayerStats,
