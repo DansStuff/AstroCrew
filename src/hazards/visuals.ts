@@ -22,6 +22,7 @@ import { shipVirtualPosition } from '../ship'
 import { ProjectedBody } from '../spaceobjects/projection'
 import { forgetTumble, Tumble } from '../spaceobjects/tumble'
 import { clampSimulationStep, directionFromTo } from '../utilities'
+import { createHealthBar, hideHealthBar, setHealthBarFraction, setupHealthBars, type HealthBar } from './healthBar'
 import { createTargetingReticule, hideReticule, type TargetingReticule } from './reticule'
 import {
   advanceSaucerBeamPulse,
@@ -44,6 +45,7 @@ type HazardVisuals = {
   kind: HazardKind
   entity: Entity
   reticule: TargetingReticule
+  healthBar: HealthBar
   beam?: SaucerBeam
 }
 
@@ -52,6 +54,8 @@ export type SpawnedHazard = {
   encounterId: string
   visuals: HazardVisuals
   targeters: string[]
+  hp: number
+  maxHp: number
   start: Vector3
   end: Vector3
   flightTime: number
@@ -64,6 +68,8 @@ type HazardSpawnData = {
   position: Vector3
   flightTime: number
   kind: string
+  hp: number
+  maxHp: number
 }
 
 let asteroidPool: ObjectPool<HazardVisuals>
@@ -116,6 +122,7 @@ function createHazardVisuals(kind: HazardKind): HazardVisuals {
     kind,
     entity,
     reticule: createTargetingReticule(entity),
+    healthBar: createHealthBar(entity, kind),
     beam: isSaucer ? createSaucerBeam() : undefined
   }
 }
@@ -135,6 +142,7 @@ function resetHazard(visuals: HazardVisuals) {
     forgetTumble(visuals.entity)
   }
   hideReticule(visuals.reticule)
+  hideHealthBar(visuals.healthBar)
   if (visuals.beam) hideSaucerBeam(visuals.beam)
   VisibilityComponent.getMutable(visuals.entity).visible = false
 }
@@ -180,6 +188,8 @@ function spawnHazard(data: HazardSpawnData) {
     encounterId: data.encounterId,
     visuals: acquireHazard(kind, path.start, radius),
     targeters: [],
+    hp: data.hp,
+    maxHp: data.maxHp,
     start: path.start,
     end: path.end,
     flightTime: data.flightTime,
@@ -188,6 +198,7 @@ function spawnHazard(data: HazardSpawnData) {
   spawned.push(hazard)
   applyVirtualPosition(hazard)
   applyTargetingAppearance(hazard)
+  setHealthBarFraction(hazard.visuals.healthBar, hazard.hp, hazard.maxHp)
   console.log(`[CLIENT] Hazard ${data.hazardId} (${kind}) spawned for ${data.encounterId}`)
 }
 
@@ -249,6 +260,7 @@ export function setupHazardVisuals() {
 
   engine.addSystem(HazardFlightSystem)
   engine.addSystem(SaucerBeamSystem)
+  setupHealthBars()
   setupHazardTargeting(spawned)
 
   room.onMessage('notifyHazardSpawn', spawnHazard)
@@ -270,6 +282,13 @@ export function setupHazardVisuals() {
     if (!hazard) return
     hazard.targeters = data.targeters
     applyTargetingAppearance(hazard)
+  })
+
+  room.onMessage('notifyHazardHealth', (data) => {
+    const hazard = findSpawnedHazard(data.hazardId)
+    if (!hazard) return
+    hazard.hp = data.hp
+    setHealthBarFraction(hazard.visuals.healthBar, hazard.hp, hazard.maxHp)
   })
 
   room.onMessage('notifySaucerFired', (data) => {

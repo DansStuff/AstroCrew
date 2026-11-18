@@ -33,11 +33,17 @@ export const Messages = {
     encounterId: Schemas.String,
     position: Schemas.Vector3,
     flightTime: Schemas.Float,
-    kind: Schemas.String
+    kind: Schemas.String,
+    hp: Schemas.Float,
+    maxHp: Schemas.Float
   }),
   notifyHazardTargeted: Schemas.Map({
     hazardId: Schemas.Int,
     targeters: Schemas.Array(Schemas.String)
+  }),
+  notifyHazardHealth: Schemas.Map({
+    hazardId: Schemas.Int,
+    hp: Schemas.Float
   }),
   notifyHazardDestroyed: Schemas.Map({
     hazardId: Schemas.Int,

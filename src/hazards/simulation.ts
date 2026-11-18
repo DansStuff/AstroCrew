@@ -37,6 +37,7 @@ type HazardBase = {
   encounterId: string
   position: Vector3
   hp: number
+  maxHp: number
   targetedBy: Set<string>
   damageElapsed: number
 }
@@ -82,8 +83,11 @@ export type HazardNotifies = {
     position: { x: number; y: number; z: number }
     flightTime: number
     kind: HazardKind
+    hp: number
+    maxHp: number
   }) => void
   notifyHazardTargeted: (data: { hazardId: number; targeters: string[] }) => void
+  notifyHazardHealth: (data: { hazardId: number; hp: number }) => void
   notifyHazardDestroyed: (data: { hazardId: number; hitShip: boolean }) => void
   notifySaucerFired: (data: {
     hazardId: number
@@ -133,7 +137,9 @@ function hazardSpawnMessage(hazard: LiveHazard) {
     encounterId: hazard.encounterId,
     position: hazard.position,
     flightTime: remainingFlightTime(hazard),
-    kind: hazard.kind
+    kind: hazard.kind,
+    hp: hazard.hp,
+    maxHp: hazard.maxHp
   }
 }
 
@@ -168,7 +174,10 @@ function damageHazard(hazardId: number, amount: number): boolean {
   const hazard = liveHazards.find((h) => h.hazardId === hazardId)
   if (!hazard) return false
   hazard.hp -= amount
-  if (hazard.hp > 0) return true
+  if (hazard.hp > 0) {
+    notifies?.notifyHazardHealth({ hazardId, hp: hazard.hp })
+    return true
+  }
   return destroyHazard(hazardId, false)
 }
 
@@ -222,6 +231,7 @@ function nextBase(encounterId: string, position: Vector3, hp: number): HazardBas
     encounterId,
     position,
     hp,
+    maxHp: hp,
     targetedBy: new Set(),
     damageElapsed: 0
   }

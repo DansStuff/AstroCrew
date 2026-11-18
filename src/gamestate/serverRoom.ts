@@ -12,6 +12,13 @@ export type HazardSpawnNotify = {
   position: { x: number; y: number; z: number }
   flightTime: number
   kind: HazardKind
+  hp: number
+  maxHp: number
+}
+
+export type HazardHealthNotify = {
+  hazardId: number
+  hp: number
 }
 
 export type HazardTargetedNotify = {
@@ -102,6 +109,10 @@ export function notifyHazardTargeted(data: HazardTargetedNotify): void {
     // TODO: potentially limit the number of targeters passed over the network to three
     targeters: data.targeters
   })
+}
+
+export function notifyHazardHealth(data: HazardHealthNotify): void {
+  room.send('notifyHazardHealth', data)
 }
 
 export function notifyHazardDestroyed(data: HazardDestroyedNotify): void {

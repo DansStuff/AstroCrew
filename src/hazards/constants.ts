@@ -89,3 +89,26 @@ export const SAUCER_BEAM_WIDTH_PULSE_AMPLITUDE = 0.4
 
 /** Seconds for one full width pulse cycle. */
 export const SAUCER_BEAM_WIDTH_PULSE_PERIOD = 0.225
+
+// MARK: Health Bars
+
+/**
+ * Local height of the health bar above a hazard's center, in the hazard's model units
+ * (models are authored at radius 1, so the bar scales with the projected hazard).
+ */
+export const HAZARD_HEALTH_BAR_OFFSET_Y_ASTEROID = 1.8
+export const HAZARD_HEALTH_BAR_OFFSET_Y_SAUCER = 1.4
+
+/** Full-health bar size in the hazard's model units. */
+export const HAZARD_HEALTH_BAR_WIDTH = 2
+export const HAZARD_HEALTH_BAR_HEIGHT = 0.2
+
+export const HAZARD_HEALTH_BAR_COLOR = Color3.create(0.1, 0.9, 0.2)
+/** Full-width backdrop behind the fill, so lost HP stays visible. */
+export const HAZARD_HEALTH_BAR_TRACK_COLOR = Color3.create(0.15, 0.03, 0.03)
+export const HAZARD_HEALTH_BAR_EMISSIVE_INTENSITY = 1.0
+
+/** Local height of the "hp / max" label's bottom edge above the bar center, in model units. */
+export const HAZARD_HEALTH_BAR_TEXT_OFFSET_Y = 0.15
+/** TextShape fontSize for the "hp / max" label. The label is unscaled relative to the hazard. */
+export const HAZARD_HEALTH_BAR_TEXT_FONT_SIZE = 4
