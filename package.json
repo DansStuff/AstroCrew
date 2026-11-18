@@ -9,11 +9,11 @@
     "build": "sdk-commands build",
     "upgrade-sdk": "npm install --save-dev @dcl/sdk@latest",
     "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next",
-    "server-logs": "sdk-commands sdk-server-logs"
+    "server-logs": "sdk-commands scene-insights tail"
   },
   "devDependencies": {
-    "@dcl/js-runtime": "7.27.1-33086747846.commit-824d240",
-    "@dcl/sdk": "7.27.1-33086747846.commit-824d240"
+    "@dcl/js-runtime": "7.33.1-44149226847.commit-7d1c56d",
+    "@dcl/sdk": "7.33.1-44149226847.commit-7d1c56d"
   },
   "engines": {
     "node": ">=16.0.0",
