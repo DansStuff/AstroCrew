@@ -3,7 +3,7 @@ import { Color3, Vector3 } from '@dcl/sdk/math'
 // MARK: Lasers
 
 /** How long a laser plane stays visible after each shot. Its width follows 0 → peak → 0 over this time. */
-export const SHIP_LASER_LIFETIME_SECONDS = 0.15
+export const SHIP_LASER_LIFETIME_SECONDS = 0.1275
 
 /** Peak scene-space width of the laser plane (local X). Length is the ship-to-asteroid distance. */
 export const SHIP_LASER_WIDTH = 0.25
