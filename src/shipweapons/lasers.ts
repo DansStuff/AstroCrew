@@ -30,7 +30,14 @@ type ActiveLaser = {
   origin: Vector3
   target: Entity
   remaining: number
+  /** Peak width, reached halfway through the shot. */
   width: number
+}
+
+/** Width over a shot's life: 0 → `peak` → 0 along half a sine wave. */
+function pulsedLaserWidth(peak: number, remaining: number): number {
+  const t = 1 - remaining / SHIP_LASER_LIFETIME_SECONDS
+  return peak * Math.sin(Math.PI * Math.min(1, Math.max(0, t)))
 }
 
 const fallbackLocalOrigin = Vector3.add(SCENE_SHIP_POSITION, SHIP_LASER_LOCAL_ORIGIN_OFFSET)
@@ -82,7 +89,7 @@ function acquireLaser(target: Entity, origin: Vector3, width: number): void {
   applyLaserMaterial(entity, isWeaponsOvercharged())
   VisibilityComponent.getMutable(entity).visible = true
   if (Transform.has(target)) {
-    poseBeamStrip(entity, origin, Transform.get(target).position, width)
+    poseBeamStrip(entity, origin, Transform.get(target).position, 0)
   }
   active.push({ entity, origin, target, remaining: SHIP_LASER_LIFETIME_SECONDS, width })
   playLaserSound()
@@ -153,7 +160,8 @@ function updateActive(dt: number): void {
       releaseLaser(i)
       continue
     }
-    poseBeamStrip(laser.entity, laser.origin, Transform.get(laser.target).position, laser.width)
+    const width = pulsedLaserWidth(laser.width, laser.remaining)
+    poseBeamStrip(laser.entity, laser.origin, Transform.get(laser.target).position, width)
   }
 }
 
