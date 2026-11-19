@@ -47,27 +47,22 @@ export const ENGINEERING_REPAIR_BASE_HP = 5
 export const ENGINEERING_REPAIR_HP_PER_LEVEL = 1
 
 /**
- * Shots per second for the local player's laser (fixed), and per other player targeting
- * the same hazard. Other players multiply this, up to SHIP_LASER_MAX_TARGETERS.
+ * Seconds between shots from each gunner locked on a hazard. Every shot is one damage
+ * message, which clients also play as that gunner's laser. A new lock fires immediately;
+ * switching targets keeps the gunner's shot clock.
  */
-export const SHIP_LASER_BASE_FIRE_RATE = 1.5
-
-/** Clamp on other players' shot frequency. 1 other = base rate; 5+ others = 5× base. The local laser is not counted. */
-export const SHIP_LASER_MAX_TARGETERS = 5
-
-/** Seconds between damage ticks on a locked hazard. First hit waits one full interval. */
 export const HAZARD_DAMAGE_INTERVAL = 0.5
 
-/** Damage dealt by a level 1 gunner each damage tick. */
+/** Damage dealt by a level 1 gunner each shot. */
 export const GUNNER_BASE_DAMAGE = 12
 /** Extra damage per gunner level above 1. Level 2 = 12, level 10 = 28. */
 export const GUNNER_DAMAGE_PER_LEVEL = 2
 
-/** HP of an asteroid at encounter hpMultiplier 1. Level 1 TTK is 5s (10 ticks × 10 damage). */
+/** HP of an asteroid at encounter hpMultiplier 1. One level 1 gunner: 8 shots × 12 damage, 3.5s TTK. */
 export const BASE_ASTEROID_HP = 90
 /** Hull damage when an asteroid reaches the ship at encounter damageMultiplier 1. */
 export const BASE_ASTEROID_DAMAGE = 10
-/** HP of a saucer at encounter hpMultiplier 1. Level 1 TTK is 6s (12 ticks × 10 damage). */
+/** HP of a saucer at encounter hpMultiplier 1. One level 1 gunner: 13 shots × 12 damage, 6s TTK. */
 export const BASE_SAUCER_HP = 150
 /** Hull damage per saucer shot at encounter damageMultiplier 1. */
 export const BASE_SAUCER_DAMAGE = 8
@@ -112,7 +107,7 @@ export const GUNNER_XP_GROWTH = 2
 /** XP to go from engineering 1 to 2. Later levels cost ENGINEERING_XP_GROWTH times the previous. */
 export const ENGINEERING_XP_LEVEL_1 = 160
 export const ENGINEERING_XP_GROWTH = 1.5
-/** Gunner XP granted each damage tick while locked on a hazard. */
+/** Gunner XP granted for each shot that deals damage. */
 export const SKILL_XP_PER_GUNNER_HIT = 5
 /** Engineering XP granted for each successful breach repair. */
 export const SKILL_XP_PER_REPAIR = 40

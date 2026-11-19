@@ -23,15 +23,44 @@ let localTargetId: number | undefined
 let localTargetTurret: TurretId | null = null
 let targetCooldownRemaining = 0
 
+/**
+ * Server-confirmed locks: player address → hazard id, built from `notifyHazardTargeted`.
+ * Drives the targeter portraits. The local crosshair uses `localTargetId` instead, so it shows on click.
+ */
+const locks = new Map<string, number>()
+
 export function clearLocalTarget(): void {
   localTargetId = undefined
   localTargetTurret = null
 }
 
-export function clearLocalTargetIf(hazardId: number): void {
-  if (localTargetId === hazardId) {
-    clearLocalTarget()
+/** Record a server lock. Returns the hazard the player was locked onto before, if any. */
+export function setLock(address: string, hazardId: number): number | undefined {
+  const previous = locks.get(address)
+  locks.set(address, hazardId)
+  return previous
+}
+
+export function targetersOf(hazardId: number): string[] {
+  const addresses: string[] = []
+  for (const [address, lockedId] of locks) {
+    if (lockedId === hazardId) addresses.push(address)
   }
+  return addresses
+}
+
+/** The hazard is gone: drop every lock on it, including the local one. */
+export function releaseLocks(hazardId: number): void {
+  for (const [address, lockedId] of locks) {
+    if (lockedId === hazardId) locks.delete(address)
+  }
+  if (localTargetId === hazardId) clearLocalTarget()
+}
+
+/** Hazard ids restart each mission, so stale locks must not survive a reset. */
+export function releaseAllLocks(): void {
+  locks.clear()
+  clearLocalTarget()
 }
 
 export function isLocalTarget(hazardId: number): boolean {
@@ -42,15 +71,14 @@ export function getLocalTargetTurret(): TurretId | null {
   return localTargetTurret
 }
 
-/** Targeters other than the local player. Counts everyone if the local player isn't known yet. */
-export function otherTargeterCount(targeters: string[]): number {
+/** False if the local player isn't known yet. */
+export function isLocalPlayer(address: string): boolean {
   const localAddress = getPlayer()?.userId?.toLowerCase()
-  if (!localAddress) return targeters.length
-  return targeters.filter((address) => address.toLowerCase() !== localAddress).length
+  return localAddress !== undefined && address.toLowerCase() === localAddress
 }
 
 export function applyTargetingAppearance(hazard: SpawnedHazard): void {
-  applyReticule(hazard.visuals.reticule, hazard.targeters, isLocalTarget(hazard.hazardId))
+  applyReticule(hazard.visuals.reticule, targetersOf(hazard.hazardId), isLocalTarget(hazard.hazardId))
 }
 
 function findHazard(hazardId: number): SpawnedHazard | undefined {

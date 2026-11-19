@@ -37,18 +37,20 @@ export const Messages = {
     hp: Schemas.Float,
     maxHp: Schemas.Float
   }),
+  /** `targeter` locked onto `hazardId`, releasing any previous lock. */
   notifyHazardTargeted: Schemas.Map({
     hazardId: Schemas.Int,
-    targeters: Schemas.Array(Schemas.String)
+    targeter: Schemas.String
   }),
+  /** One gunner's laser shot. Clients update HP and play the laser from `shooter`. hp 0 = shot down. */
   notifyHazardHealth: Schemas.Map({
     hazardId: Schemas.Int,
-    hp: Schemas.Float
+    hp: Schemas.Float,
+    shooter: Schemas.String
   }),
-  notifyHazardDestroyed: Schemas.Map({
-    hazardId: Schemas.Int,
-    /** true = hit the ship; false = shot down */
-    hitShip: Schemas.Boolean
+  /** An asteroid reached the ship. */
+  notifyHazardImpact: Schemas.Map({
+    hazardId: Schemas.Int
   }),
   notifyEncounterEnd: Schemas.Map({
     encounterId: Schemas.String

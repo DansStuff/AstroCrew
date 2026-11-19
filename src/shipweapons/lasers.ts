@@ -2,7 +2,6 @@ import { AudioSource, engine, Entity, Material, Transform, VisibilityComponent }
 import { Color4, Vector3 } from '@dcl/sdk/math'
 import { isServer } from '@dcl/sdk/network'
 import { SCENE_SHIP_POSITION } from '../constants'
-import { SHIP_LASER_BASE_FIRE_RATE, SHIP_LASER_MAX_TARGETERS } from '../gamebalance/constants'
 import {
   SHIP_LASER_EMISSIVE_INTENSITY,
   SHIP_LASER_LIFETIME_SECONDS,
@@ -20,7 +19,6 @@ import {
 import { createBeamStrip, poseBeamStrip } from '../effects/beamStrip'
 import { isWeaponsOvercharged } from '../gamestate'
 import { getLocalTargetTurret } from '../hazards/targeting'
-import { forEachHazardLaserSource } from '../hazards/visuals'
 import { ObjectPool } from '../objectPool'
 import { getTurretView } from '../sceneObjects'
 import { clampSimulationStep } from '../utilities'
@@ -58,8 +56,6 @@ function localOrigin(): Vector3 {
 
 let laserPool: ObjectPool<Entity>
 const active: ActiveLaser[] = []
-const localFireElapsed = new Map<Entity, number>()
-const otherFireElapsed = new Map<Entity, number>()
 
 const laserSoundEntities: Entity[] = []
 let laserSoundIndex = 0
@@ -101,55 +97,16 @@ function releaseLaser(index: number): void {
   active.splice(index, 1)
 }
 
-/** Fire `rate` shots per second at `hazard`. Each shot calls `originForShot`. The first shot fires immediately. */
-function advanceStream(
-  elapsedByHazard: Map<Entity, number>,
-  hazard: Entity,
-  rate: number,
-  originForShot: () => Vector3,
-  width: number,
-  dt: number
-): void {
-  if (rate <= 0) {
-    elapsedByHazard.delete(hazard)
-    return
+/**
+ * Play one shot at `target`. Called once per server damage message, so shots match hits.
+ * The local player's shots come from the weapon they locked from; other players' from below the hull.
+ */
+export function fireShipLaser(target: Entity, fromLocalPlayer: boolean): void {
+  if (fromLocalPlayer) {
+    acquireLaser(target, localOrigin(), SHIP_LASER_WIDTH)
+  } else {
+    acquireLaser(target, otherShotOrigin(), SHIP_LASER_OTHER_WIDTH)
   }
-
-  const interval = 1 / rate
-  let elapsed = elapsedByHazard.get(hazard)
-  if (elapsed === undefined) {
-    elapsed = interval
-  }
-  elapsed += dt
-  while (elapsed >= interval) {
-    elapsed -= interval
-    acquireLaser(hazard, originForShot(), width)
-  }
-  elapsedByHazard.set(hazard, elapsed)
-}
-
-function pruneDespawned(elapsedByHazard: Map<Entity, number>, seen: Set<Entity>): void {
-  for (const entity of elapsedByHazard.keys()) {
-    if (!seen.has(entity)) {
-      elapsedByHazard.delete(entity)
-    }
-  }
-}
-
-function fireShots(dt: number): void {
-  const seen = new Set<Entity>()
-  const origin = localOrigin()
-
-  forEachHazardLaserSource((entity, isLocalTarget, otherTargeters) => {
-    seen.add(entity)
-    const localRate = isLocalTarget ? SHIP_LASER_BASE_FIRE_RATE : 0
-    const otherRate = SHIP_LASER_BASE_FIRE_RATE * Math.min(otherTargeters, SHIP_LASER_MAX_TARGETERS)
-    advanceStream(localFireElapsed, entity, localRate, () => origin, SHIP_LASER_WIDTH, dt)
-    advanceStream(otherFireElapsed, entity, otherRate, otherShotOrigin, SHIP_LASER_OTHER_WIDTH, dt)
-  })
-
-  pruneDespawned(localFireElapsed, seen)
-  pruneDespawned(otherFireElapsed, seen)
 }
 
 function updateActive(dt: number): void {
@@ -166,9 +123,7 @@ function updateActive(dt: number): void {
 }
 
 function LaserSystem(dt: number): void {
-  const step = clampSimulationStep(dt)
-  fireShots(step)
-  updateActive(step)
+  updateActive(clampSimulationStep(dt))
 }
 
 function createLaserSoundEntity(): Entity {

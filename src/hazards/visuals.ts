@@ -18,6 +18,7 @@ import { playGlobalSound } from '../audio/global'
 import { room } from '../networking/messages'
 import { shakeCameras, shakeShip } from '../effects/cameraShake'
 import { ObjectPool } from '../objectPool'
+import { fireShipLaser } from '../shipweapons/lasers'
 import { shipVirtualPosition } from '../ship'
 import { ProjectedBody } from '../spaceobjects/projection'
 import { forgetTumble, Tumble } from '../spaceobjects/tumble'
@@ -33,10 +34,10 @@ import {
 } from './saucerBeam'
 import {
   applyTargetingAppearance,
-  clearLocalTarget,
-  clearLocalTargetIf,
-  isLocalTarget,
-  otherTargeterCount,
+  isLocalPlayer,
+  releaseAllLocks,
+  releaseLocks,
+  setLock,
   setupHazardTargeting
 } from './targeting'
 
@@ -53,7 +54,6 @@ export type SpawnedHazard = {
   hazardId: number
   encounterId: string
   visuals: HazardVisuals
-  targeters: string[]
   hp: number
   maxHp: number
   start: Vector3
@@ -151,15 +151,6 @@ function releaseHazard(hazard: SpawnedHazard) {
   hazardPool(hazard.visuals.kind).release(hazard.visuals)
 }
 
-/** Visit every live hazard with what the ship lasers need to fire at it. */
-export function forEachHazardLaserSource(
-  visitor: (entity: Entity, isLocalTarget: boolean, otherTargeters: number) => void
-): void {
-  for (const hazard of spawned) {
-    visitor(hazard.visuals.entity, isLocalTarget(hazard.hazardId), otherTargeterCount(hazard.targeters))
-  }
-}
-
 function findSpawnedHazard(hazardId: number): SpawnedHazard | undefined {
   return spawned.find((hazard) => hazard.hazardId === hazardId)
 }
@@ -187,7 +178,6 @@ function spawnHazard(data: HazardSpawnData) {
     hazardId: data.hazardId,
     encounterId: data.encounterId,
     visuals: acquireHazard(kind, path.start, radius),
-    targeters: [],
     hp: data.hp,
     maxHp: data.maxHp,
     start: path.start,
@@ -203,7 +193,7 @@ function spawnHazard(data: HazardSpawnData) {
 }
 
 function despawnHazard(hazardId: number) {
-  clearLocalTargetIf(hazardId)
+  releaseLocks(hazardId)
   const index = spawned.findIndex((hazard) => hazard.hazardId === hazardId)
   if (index < 0) return
   const [hazard] = spawned.splice(index, 1)
@@ -214,13 +204,13 @@ export function despawnEncounter(encounterId: string) {
   for (let i = spawned.length - 1; i >= 0; i--) {
     if (spawned[i].encounterId !== encounterId) continue
     const [hazard] = spawned.splice(i, 1)
-    clearLocalTargetIf(hazard.hazardId)
+    releaseLocks(hazard.hazardId)
     releaseHazard(hazard)
   }
 }
 
 export function despawnAllHazards() {
-  clearLocalTarget()
+  releaseAllLocks()
   const hazards = spawned.splice(0, spawned.length)
   for (const hazard of hazards) {
     releaseHazard(hazard)
@@ -265,23 +255,21 @@ export function setupHazardVisuals() {
 
   room.onMessage('notifyHazardSpawn', spawnHazard)
 
-  room.onMessage('notifyHazardDestroyed', (data) => {
-    const cause = data.hitShip ? 'hit ship' : 'shot'
-    console.log(`[CLIENT] Hazard ${data.hazardId} destroyed (${cause})`)
-    if (data.hitShip) {
-      playGlobalSound(HAZARD_HIT_SHIP_SOUND_PATH)
-      shakeCameras(CAMERA_SHAKE_HAZARD_IMPACT_INTENSITY)
-      shakeShip(CAMERA_SHAKE_HAZARD_IMPACT_INTENSITY)
-    }
+  room.onMessage('notifyHazardImpact', (data) => {
+    console.log(`[CLIENT] Hazard ${data.hazardId} hit the ship`)
+    playGlobalSound(HAZARD_HIT_SHIP_SOUND_PATH)
+    shakeCameras(CAMERA_SHAKE_HAZARD_IMPACT_INTENSITY)
+    shakeShip(CAMERA_SHAKE_HAZARD_IMPACT_INTENSITY)
     despawnHazard(data.hazardId)
   })
 
   room.onMessage('notifyHazardTargeted', (data) => {
-    console.log(`[CLIENT] Hazard ${data.hazardId} targeted by [${data.targeters.join(', ')}]`)
-    const hazard = findSpawnedHazard(data.hazardId)
-    if (!hazard) return
-    hazard.targeters = data.targeters
-    applyTargetingAppearance(hazard)
+    console.log(`[CLIENT] Hazard ${data.hazardId} targeted by ${data.targeter}`)
+    const previousId = setLock(data.targeter, data.hazardId)
+    for (const hazardId of [previousId, data.hazardId]) {
+      const hazard = hazardId === undefined ? undefined : findSpawnedHazard(hazardId)
+      if (hazard) applyTargetingAppearance(hazard)
+    }
   })
 
   room.onMessage('notifyHazardHealth', (data) => {
@@ -289,6 +277,11 @@ export function setupHazardVisuals() {
     if (!hazard) return
     hazard.hp = data.hp
     setHealthBarFraction(hazard.visuals.healthBar, hazard.hp, hazard.maxHp)
+    fireShipLaser(hazard.visuals.entity, isLocalPlayer(data.shooter))
+    if (data.hp <= 0) {
+      console.log(`[CLIENT] Hazard ${data.hazardId} shot down by ${data.shooter}`)
+      despawnHazard(data.hazardId)
+    }
   })
 
   room.onMessage('notifySaucerFired', (data) => {

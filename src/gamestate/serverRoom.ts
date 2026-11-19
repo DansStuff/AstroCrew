@@ -19,16 +19,17 @@ export type HazardSpawnNotify = {
 export type HazardHealthNotify = {
   hazardId: number
   hp: number
+  /** Address of the gunner whose shot caused this change. */
+  shooter: string
 }
 
 export type HazardTargetedNotify = {
   hazardId: number
-  targeters: string[]
+  targeter: string
 }
 
-export type HazardDestroyedNotify = {
+export type HazardImpactNotify = {
   hazardId: number
-  hitShip: boolean
 }
 
 export type SaucerFiredNotify = {
@@ -104,19 +105,15 @@ export function notifyHazardSpawn(data: HazardSpawnNotify): void {
 }
 
 export function notifyHazardTargeted(data: HazardTargetedNotify): void {
-  room.send('notifyHazardTargeted', {
-    hazardId: data.hazardId,
-    // TODO: potentially limit the number of targeters passed over the network to three
-    targeters: data.targeters
-  })
+  room.send('notifyHazardTargeted', data)
 }
 
 export function notifyHazardHealth(data: HazardHealthNotify): void {
   room.send('notifyHazardHealth', data)
 }
 
-export function notifyHazardDestroyed(data: HazardDestroyedNotify): void {
-  room.send('notifyHazardDestroyed', data)
+export function notifyHazardImpact(data: HazardImpactNotify): void {
+  room.send('notifyHazardImpact', data)
 }
 
 export function notifySaucerFired(data: SaucerFiredNotify): void {

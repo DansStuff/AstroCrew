@@ -42,7 +42,7 @@ import {
 import {
   notifyEncounterEnd,
   notifyEncounterStage,
-  notifyHazardDestroyed,
+  notifyHazardImpact,
   notifyHazardHealth,
   notifyHazardSpawn,
   notifyHazardTargeted,
@@ -284,7 +284,7 @@ export function setupStateMachine(): void {
     notifyHazardSpawn,
     notifyHazardTargeted,
     notifyHazardHealth,
-    notifyHazardDestroyed,
+    notifyHazardImpact,
     notifySaucerFired
   })
 

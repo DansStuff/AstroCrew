@@ -10,7 +10,6 @@ import {
   ASTEROID_FLIGHT_TIME,
   gunnerShotDamage,
   HAZARD_DAMAGE_INTERVAL,
-  type HazardKind,
   OVERCHARGE_DAMAGE_MULTIPLIER,
   playerCountDamageMultiplier,
   SAUCER_APPROACH_SECONDS,
@@ -25,6 +24,13 @@ import {
   SAUCER_HOVER_DISTANCE
 } from './constants'
 import { activateRandomBreach, damageShipHull, isWeaponsOvercharged } from '../gamestate'
+import type {
+  HazardHealthNotify,
+  HazardImpactNotify,
+  HazardSpawnNotify,
+  HazardTargetedNotify,
+  SaucerFiredNotify
+} from '../gamestate/serverRoom'
 import { addDamage } from '../players/contributions'
 import { awardSkillXp, getGunnerLevel } from '../players/stats'
 import { getKnownBreachIds, getTurretView } from '../sceneObjects'
@@ -38,8 +44,6 @@ type HazardBase = {
   position: Vector3
   hp: number
   maxHp: number
-  targetedBy: Set<string>
-  damageElapsed: number
 }
 
 type LiveAsteroid = HazardBase & {
@@ -77,26 +81,25 @@ type SpawnSaucerOpts = {
 type SpawnHazardOpts = SpawnAsteroidOpts | SpawnSaucerOpts
 
 export type HazardNotifies = {
-  notifyHazardSpawn: (data: {
-    hazardId: number
-    encounterId: string
-    position: { x: number; y: number; z: number }
-    flightTime: number
-    kind: HazardKind
-    hp: number
-    maxHp: number
-  }) => void
-  notifyHazardTargeted: (data: { hazardId: number; targeters: string[] }) => void
-  notifyHazardHealth: (data: { hazardId: number; hp: number }) => void
-  notifyHazardDestroyed: (data: { hazardId: number; hitShip: boolean }) => void
-  notifySaucerFired: (data: {
-    hazardId: number
-    position: { x: number; y: number; z: number }
-  }) => void
+  notifyHazardSpawn: (data: HazardSpawnNotify) => void
+  notifyHazardTargeted: (data: HazardTargetedNotify) => void
+  notifyHazardHealth: (data: HazardHealthNotify) => void
+  notifyHazardImpact: (data: HazardImpactNotify) => void
+  notifySaucerFired: (data: SaucerFiredNotify) => void
+}
+
+/**
+ * A player's lock, which belongs to the ship: it outlives the player's connection and is only
+ * released when its hazard goes. Fires one shot every HAZARD_DAMAGE_INTERVAL on its own clock.
+ */
+type Targeter = {
+  hazardId: number
+  elapsed: number
 }
 
 let liveHazards: LiveHazard[] = []
-const playerTarget = new Map<string, number>()
+/** Player address → their lock. The only record of who is targeting what. */
+const targeters = new Map<string, Targeter>()
 let nextHazardId = 1
 let notifies: HazardNotifies | null = null
 
@@ -131,7 +134,7 @@ function remainingFlightTime(hazard: LiveHazard): number {
   return Math.max(0, hazard.approachTime - hazard.approachElapsed)
 }
 
-function hazardSpawnMessage(hazard: LiveHazard) {
+function hazardSpawnMessage(hazard: LiveHazard): HazardSpawnNotify {
   return {
     hazardId: hazard.hazardId,
     encounterId: hazard.encounterId,
@@ -143,24 +146,18 @@ function hazardSpawnMessage(hazard: LiveHazard) {
   }
 }
 
-function clearTargeting() {
-  playerTarget.clear()
+function findLive(hazardId: number): LiveHazard | undefined {
+  return liveHazards.find((h) => h.hazardId === hazardId)
 }
 
-function broadcastHazardTargeted(hazard: LiveHazard) {
-  notifies?.notifyHazardTargeted({
-    hazardId: hazard.hazardId,
-    targeters: [...hazard.targetedBy]
-  })
-}
-
-function clearHazardLockers(hazard: LiveHazard) {
-  for (const address of hazard.targetedBy) {
-    if (playerTarget.get(address) === hazard.hazardId) {
-      playerTarget.delete(address)
-    }
+/** Drop a hazard and every lock on it. Clients release their copy of the locks when they despawn it. */
+function removeLive(hazard: LiveHazard): void {
+  const index = liveHazards.indexOf(hazard)
+  if (index < 0) return
+  liveHazards.splice(index, 1)
+  for (const [address, targeter] of targeters) {
+    if (targeter.hazardId === hazard.hazardId) targeters.delete(address)
   }
-  hazard.targetedBy.clear()
 }
 
 function openRandomBreach(): void {
@@ -170,59 +167,32 @@ function openRandomBreach(): void {
   }
 }
 
-function damageHazard(hazardId: number, amount: number): boolean {
-  const hazard = liveHazards.find((h) => h.hazardId === hazardId)
-  if (!hazard) return false
-  hazard.hp -= amount
-  if (hazard.hp > 0) {
-    notifies?.notifyHazardHealth({ hazardId, hp: hazard.hp })
-    return true
-  }
-  return destroyHazard(hazardId, false)
-}
-
+/**
+ * Lock `playerAddress` onto `hazardId`. A new lock fires on the next tick. Switching keeps the
+ * player's shot clock, so retargeting can never fire faster than one shot per interval.
+ */
 export function setPlayerTarget(playerAddress: string, hazardId: number) {
-  const hazard = liveHazards.find((h) => h.hazardId === hazardId)
-  if (!hazard) return
+  if (!findLive(hazardId)) return
 
-  const previousId = playerTarget.get(playerAddress)
-  if (previousId === hazardId) return
+  const targeter = targeters.get(playerAddress)
+  if (targeter?.hazardId === hazardId) return
 
-  if (previousId !== undefined) {
-    const previous = liveHazards.find((h) => h.hazardId === previousId)
-    if (previous) {
-      previous.targetedBy.delete(playerAddress)
-      if (previous.targetedBy.size === 0) {
-        previous.damageElapsed = 0
-      }
-      broadcastHazardTargeted(previous)
-    }
+  if (targeter) {
+    targeter.hazardId = hazardId
+  } else {
+    targeters.set(playerAddress, { hazardId, elapsed: HAZARD_DAMAGE_INTERVAL })
   }
-
-  hazard.targetedBy.add(playerAddress)
-  playerTarget.set(playerAddress, hazardId)
-  broadcastHazardTargeted(hazard)
-  console.log(
-    `[SERVER] Hazard ${hazardId} targeted by ${playerAddress} (count ${hazard.targetedBy.size})`
-  )
+  notifies?.notifyHazardTargeted({ hazardId, targeter: playerAddress })
+  console.log(`[SERVER] Hazard ${hazardId} targeted by ${playerAddress}`)
 }
 
-/** Remove a live hazard and tell clients to despawn it. `hitShip` true = collided with the ship; false = shot. */
-export function destroyHazard(hazardId: number, hitShip: boolean): boolean {
-  const index = liveHazards.findIndex((h) => h.hazardId === hazardId)
-  if (index < 0) return false
-  const hazard = liveHazards[index]
-  clearHazardLockers(hazard)
-  liveHazards.splice(index, 1)
-  if (hitShip) {
-    if (hazard.kind === 'asteroid') {
-      damageShipHull(hazard.impactDamage)
-    }
-    openRandomBreach()
-  }
-  notifies?.notifyHazardDestroyed({ hazardId, hitShip })
-  console.log(`[SERVER] Hazard ${hazardId} destroyed (${hitShip ? 'hit ship' : 'shot'})`)
-  return true
+/** An asteroid reached the ship: hull damage, a breach, and clients play the impact and despawn it. */
+function impactShip(hazard: LiveAsteroid): void {
+  removeLive(hazard)
+  damageShipHull(hazard.impactDamage)
+  openRandomBreach()
+  notifies?.notifyHazardImpact({ hazardId: hazard.hazardId })
+  console.log(`[SERVER] Hazard ${hazard.hazardId} hit the ship`)
 }
 
 function nextBase(encounterId: string, position: Vector3, hp: number): HazardBase {
@@ -231,9 +201,7 @@ function nextBase(encounterId: string, position: Vector3, hp: number): HazardBas
     encounterId,
     position,
     hp,
-    maxHp: hp,
-    targetedBy: new Set(),
-    damageElapsed: 0
+    maxHp: hp
   }
 }
 
@@ -265,12 +233,10 @@ export function spawn(encounterId: string, opts: SpawnHazardOpts): number {
   return hazard.hazardId
 }
 
-function tickAsteroid(hazard: LiveAsteroid, dt: number): number | null {
+/** True once the asteroid has reached the ship. */
+function tickAsteroid(hazard: LiveAsteroid, dt: number): boolean {
   hazard.flightElapsed += dt
-  if (hazard.flightElapsed >= hazard.flightTime) {
-    return hazard.hazardId
-  }
-  return null
+  return hazard.flightElapsed >= hazard.flightTime
 }
 
 function tickSaucer(hazard: LiveSaucer, dt: number): void {
@@ -295,54 +261,53 @@ function connectedPlayerCount(): number {
   return Array.from(engine.getEntitiesWith(PlayerIdentityData)).length
 }
 
-function tickTargetedDamage(dt: number): void {
-  const lockedIds: number[] = []
-  for (const hazard of liveHazards) {
-    if (hazard.targetedBy.size > 0) {
-      hazard.damageElapsed += dt
-      lockedIds.push(hazard.hazardId)
-    } else {
-      hazard.damageElapsed = 0
-    }
+/**
+ * One laser shot from `address`. Each shot is one health message, which clients also play
+ * as the laser. A message with hp 0 means the shot destroyed the hazard; there is no separate destroy message.
+ */
+function fireShot(address: string, hazardId: number, damageScale: number): void {
+  const hazard = findLive(hazardId)
+  if (!hazard) return
+  const damage = Math.round(gunnerShotDamage(getGunnerLevel(address)) * damageScale)
+  if (damage <= 0) return
+  addDamage(address, damage)
+  awardSkillXp(address, 'gunner', SKILL_XP_PER_GUNNER_HIT)
+  hazard.hp -= damage
+  notifies?.notifyHazardHealth({ hazardId, hp: Math.max(0, hazard.hp), shooter: address })
+  if (hazard.hp <= 0) {
+    removeLive(hazard)
+    console.log(`[SERVER] Hazard ${hazardId} shot down by ${address}`)
   }
-  if (lockedIds.length === 0) return
-  const crowdScale = playerCountDamageMultiplier(connectedPlayerCount())
-  for (const hazardId of lockedIds) {
-    const hazard = liveHazards.find((h) => h.hazardId === hazardId)
-    if (!hazard) continue
-    while (hazard.damageElapsed >= HAZARD_DAMAGE_INTERVAL) {
-      hazard.damageElapsed -= HAZARD_DAMAGE_INTERVAL
-      let amount = 0
-      const multiplier = isWeaponsOvercharged() ? OVERCHARGE_DAMAGE_MULTIPLIER : 1
-      for (const address of hazard.targetedBy) {
-        const damage = Math.round(gunnerShotDamage(getGunnerLevel(address)) * multiplier * crowdScale)
-        addDamage(address, damage)
-        if (damage > 0) {
-          awardSkillXp(address, 'gunner', SKILL_XP_PER_GUNNER_HIT)
-        }
-        amount += damage
-      }
-      if (amount <= 0) break
-      if (!damageHazard(hazardId, amount)) break
+}
+
+function tickTargeters(dt: number): void {
+  if (targeters.size === 0) return
+  const overcharge = isWeaponsOvercharged() ? OVERCHARGE_DAMAGE_MULTIPLIER : 1
+  const damageScale = overcharge * playerCountDamageMultiplier(connectedPlayerCount())
+  // A kill deletes that hazard's locks mid-loop; Map iteration skips deleted entries.
+  for (const [address, targeter] of targeters) {
+    targeter.elapsed += dt
+    while (targeter.elapsed >= HAZARD_DAMAGE_INTERVAL && targeters.get(address) === targeter) {
+      targeter.elapsed -= HAZARD_DAMAGE_INTERVAL
+      fireShot(address, targeter.hazardId, damageScale)
     }
   }
 }
 
 export function tick(dt: number): void {
-  const expiredIds: number[] = []
+  const arrived: LiveAsteroid[] = []
   for (const hazard of liveHazards) {
     if (hazard.kind === 'asteroid') {
-      const expiredId = tickAsteroid(hazard, dt)
-      if (expiredId !== null) expiredIds.push(expiredId)
+      if (tickAsteroid(hazard, dt)) arrived.push(hazard)
     } else {
       tickSaucer(hazard, dt)
     }
   }
-  for (const hazardId of expiredIds) {
-    destroyHazard(hazardId, true)
+  for (const asteroid of arrived) {
+    impactShip(asteroid)
   }
 
-  tickTargetedDamage(dt)
+  tickTargeters(dt)
 }
 
 export function hasLive(): boolean {
@@ -352,7 +317,7 @@ export function hasLive(): boolean {
 /** Clear live hazards and targeting locks. Hazard ids keep incrementing. */
 export function clearLive(): void {
   liveHazards = []
-  clearTargeting()
+  targeters.clear()
 }
 
 /** Clear live hazards and reset hazard ids for a new mission. */
